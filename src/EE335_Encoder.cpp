@@ -4,8 +4,6 @@ Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt ,
     this->pin = pin;
     this->thread = thread;
     
-    factor = F_CPU / 1024.0 * wheelCircumference / holesPerRevolution;
-    
     period = UINT16_MAX;
     
     switch ( timer ) {
@@ -19,6 +17,8 @@ Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt ,
     
     this->timer->setMode( NORMAL );
     this->timer->setClockSource( CLOCK_1024 );
+    
+    factor = this->timer->getTickRate() * wheelCircumference / holesPerRevolution;
     
     attachInterruptCustom( pin , RISING , onRisingEdge , this );
     switch ( thread ) {
