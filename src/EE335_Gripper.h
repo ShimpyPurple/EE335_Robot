@@ -2,7 +2,7 @@
 #define EE335_Gripper_h
 
 #include "Arduino.h"
-#include "TimerControllers.h"
+#include "CustomTimers.h"
 
 #if !defined( __AVR_ATmega328P__ ) && !defined( __AVR_ATmega2560__ )
 #warning "EE335_Gripper is only tested for ATmega328P and ATmega2560"

@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 #include "Constants/Constants.h"
-#include "TimerControllers.h"
+#include "CustomTimers.h"
 #include "CustomInterrupts.h"
 
 #if !defined( __AVR_ATmega328P__ ) && !defined( __AVR_ATmega2560__ )
