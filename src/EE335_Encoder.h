@@ -14,13 +14,15 @@ class Encoder {
 	public:
 		Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt , float wheelCircumference , uint8_t holesPerRevolution );
         float getSpeed();
+        void kill();
 	
 	private:
         uint8_t pin;
-        BaseTimer16 *timer;
         uint8_t thread;
-        float factor;
         uint16_t period;
+        BaseTimer16 *timer;
+        bool timerReserved;
+        float factor;
         static void onRisingEdge( void *object );
         static void onWrap( void *object );
 		

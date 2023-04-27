@@ -15,6 +15,14 @@ Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt ,
 #endif
     }
     
+    if ( this->timer->isFree() ) {
+        this->timer->reserve();
+        timerReserved = true;
+    } else {
+        timerReserved = false;
+        return;
+    }
+    
     this->timer->setMode( NORMAL );
     this->timer->setClockSource( CLOCK_1024 );
     
@@ -33,6 +41,12 @@ Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt ,
 
 float Encoder::getSpeed() {
     return factor / period;
+}
+
+void Encoder::kill() {
+    if ( timerReserved ) {
+        timer->release();
+    }
 }
 
 static void Encoder::onRisingEdge( void *object ) {
