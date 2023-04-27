@@ -1,6 +1,8 @@
 #include "EE335_Bluetooth.h"
 
-Bluetooth::Bluetooth( uint8_t serialPort , uint8_t rxMode ) {
+Bluetooth::Bluetooth( uint8_t serialPort , uint8_t rxMode ):
+    rxMode( rxMode )
+{
     switch ( serialPort ) {
         case SERIAL_0: btSerial = &Serial;  break;
 #if defined( __AVR_ATmega2560__ )
@@ -11,8 +13,6 @@ Bluetooth::Bluetooth( uint8_t serialPort , uint8_t rxMode ) {
     }
 
     btSerial->begin( 9600 );
-    
-    this->rxMode = rxMode;
 }
 
 void Bluetooth::getInstruction() {

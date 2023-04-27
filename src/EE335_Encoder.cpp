@@ -1,9 +1,9 @@
 #include "EE335_Encoder.h"
 
-Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt , float wheelCircumference , uint8_t holesPerRevolution ) {
-    this->pin = pin;
-    this->thread = thread;
-    
+Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt , float wheelCircumference , uint8_t holesPerRevolution ):
+    pin( pin ) ,
+    thread( thread )
+{
     period = UINT16_MAX;
     
     switch ( timer ) {
