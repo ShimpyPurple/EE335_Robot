@@ -6,27 +6,27 @@ Gripper::Gripper( uint8_t pin , ServoManager *servoManager ):
 {}
 
 Gripper::Gripper( uint8_t pin , uint8_t timer ):
-    pin( pin )
-{
-    servoManager = new ServoManager( timer );
-}
+    pin( pin ) ,
+    servoManager( new ServoManager(timer) )
+{}
 
 Gripper::Gripper( uint8_t pin , BaseTimer16 *timer16 ):
-    pin( pin )
-{
-    servoManager = new ServoManager( timer16 );
-}
+    pin( pin ) ,
+    servoManager( new ServoManager(timer16) )
+{}
 
 Gripper::Gripper( uint8_t pin , BaseTimer8Async *timer8 ):
-    pin( pin )
-{
-    servoManager = new ServoManager( timer8 );
-}
+    pin( pin ) ,
+    servoManager( new ServoManager(timer8) )
+{}
 
 Gripper::Gripper( uint8_t pin , GenericTimer *timer ):
-    pin( pin )
-{
-    servoManager = new ServoManager( timer );
+    pin( pin ) ,
+    servoManager( new ServoManager(timer) )
+{}
+
+void Gripper::begin() {
+    servoManager->begin();
 }
 
 void Gripper::open() {
