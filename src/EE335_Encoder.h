@@ -12,7 +12,8 @@
 
 class Encoder {
     public:
-        Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt , float wheelCircumference , uint8_t holesPerRevolution );
+        Encoder( uint8_t pin , uint8_t timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution );
+        Encoder( uint8_t pin , BaseTimer16 *timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution );
         float getSpeed();
         void kill();
     
@@ -20,6 +21,7 @@ class Encoder {
         uint8_t pin;
         uint8_t thread;
         uint16_t period;
+        void init( float wheelCircumference , uint8_t holesPerRevolution );
         BaseTimer16 *timer;
         bool timerReserved;
         float factor;

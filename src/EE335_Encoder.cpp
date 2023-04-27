@@ -1,11 +1,10 @@
 #include "EE335_Encoder.h"
 
-Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt , float wheelCircumference , uint8_t holesPerRevolution ):
+Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution ):
     pin( pin ) ,
-    thread( thread )
+    thread( thread ) ,
+    period( UINT16_MAX )
 {
-    period = UINT16_MAX;
-    
     switch ( timer ) {
         case TIMER_1: this->timer = &Timer1; break;
 #if defined( __AVR_ATmega2560__ )
@@ -16,28 +15,40 @@ Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt ,
         default: timerReserved = false; return;
     }
     
-    if ( this->timer->isFree() ) {
-        this->timer->reserve();
+    init( wheelCircumference , holesPerRevolution );
+}
+
+Encoder::Encoder( uint8_t pin , BaseTimer16 *timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution ):
+    pin( pin ) ,
+    thread( thread ) ,
+    period( UINT16_MAX ) ,
+    timer( timer )
+{
+    init( wheelCircumference , holesPerRevolution );
+}
+
+void Encoder::init( float wheelCircumference , uint8_t holesPerRevolution ) {
+    if ( timer->isFree() ) {
+        timer->reserve();
         timerReserved = true;
     } else {
         timerReserved = false;
         return;
     }
     
-    this->timer->setMode( NORMAL );
-    this->timer->setClockSource( CLOCK_1024 );
+    timer->setMode( NORMAL );
+    timer->setClockSource( CLOCK_1024 );
     
-    factor = this->timer->getTickRate() * wheelCircumference / holesPerRevolution;
+    factor = timer->getTickRate() * wheelCircumference / holesPerRevolution;
     
     attachInterruptCustom( pin , RISING , onRisingEdge , this );
     switch ( thread ) {
-        case THREAD_A: this->timer->attachInterrupt( COMPARE_MATCH_A , onWrap , this ); break;
-        case THREAD_B: this->timer->attachInterrupt( COMPARE_MATCH_B , onWrap , this ); break;
+        case THREAD_A: timer->attachInterrupt( COMPARE_MATCH_A , onWrap , this ); break;
+        case THREAD_B: timer->attachInterrupt( COMPARE_MATCH_B , onWrap , this ); break;
 #if defined( __AVR_ATmega2560__ )
-        case THREAD_C: this->timer->attachInterrupt( COMPARE_MATCH_C , onWrap , this ); break;
+        case THREAD_C: timer->attachInterrupt( COMPARE_MATCH_C , onWrap , this ); break;
 #endif
     }
-    
 }
 
 float Encoder::getSpeed() {
