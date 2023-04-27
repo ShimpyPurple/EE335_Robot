@@ -11,12 +11,12 @@
 #endif
 
 class Encoder {
-	public:
-		Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt , float wheelCircumference , uint8_t holesPerRevolution );
+    public:
+        Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt , float wheelCircumference , uint8_t holesPerRevolution );
         float getSpeed();
         void kill();
-	
-	private:
+    
+    private:
         uint8_t pin;
         uint8_t thread;
         uint16_t period;
@@ -25,7 +25,7 @@ class Encoder {
         float factor;
         static void onRisingEdge( void *object );
         static void onWrap( void *object );
-		
+        
 };
 
 #endif

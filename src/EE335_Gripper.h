@@ -9,12 +9,12 @@
 #endif
 
 class Gripper {
-	public:
-		Gripper( uint8_t pin );
-		// Gripper( uint8_t pin , uint8_t timer );
-		
+    public:
+        Gripper( uint8_t pin );
+        // Gripper( uint8_t pin , uint8_t timer );
+        
     
-	private:
+    private:
         uint8_t pin;
         
     
