@@ -43,14 +43,6 @@
 #define FORWARD HIGH
 #define BACKWARD LOW
 
-// 16 bit Timers
-#define TIMER_1 1
-#if defined( __AVR_ATmega2560__ )
-#define TIMER_3 3
-#define TIMER_4 4
-#define TIMER_5 5
-#endif
-
 // Timer Threads
 #define THREAD_A 0
 #define THREAD_B 1
