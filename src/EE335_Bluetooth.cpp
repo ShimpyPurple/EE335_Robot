@@ -1,6 +1,7 @@
 #include "EE335_Bluetooth.h"
 
 Bluetooth::Bluetooth( uint8_t serialPort , uint8_t rxMode ):
+    noSerial( false ) ,
     rxMode( rxMode )
 {
     switch ( serialPort ) {
@@ -10,12 +11,14 @@ Bluetooth::Bluetooth( uint8_t serialPort , uint8_t rxMode ):
         case SERIAL_2: btSerial = &Serial2; break;
         case SERIAL_3: btSerial = &Serial3; break;
 #endif
+        default: noSerial = true; return;
     }
 
     btSerial->begin( 9600 );
 }
 
 void Bluetooth::getInstruction() {
+    if ( noSerial ) return;
     switch ( rxMode ) {
         case CONTROLLER: getControllerInstruction(); break;
         case PLAIN_TEXT: getPlainTextInstruction();  break;

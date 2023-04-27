@@ -13,6 +13,7 @@ Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt ,
         case TIMER_4: this->timer = &Timer4; break;
         case TIMER_5: this->timer = &Timer5; break;
 #endif
+        default: timerReserved = false; return;
     }
     
     if ( this->timer->isFree() ) {
