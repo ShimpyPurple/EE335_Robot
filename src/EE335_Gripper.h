@@ -22,6 +22,7 @@ class Gripper {
         
         void open();
         void close();
+        void write( float percent );
     
     private:
         uint8_t pin;

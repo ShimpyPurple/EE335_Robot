@@ -36,3 +36,10 @@ void Gripper::open() {
 void Gripper::close() {
     servoManager->write( pin , CLOSE_PERCENT );
 }
+
+void Gripper::write( float percent ) {
+    if ( percent > 100 ) percent = 100;
+    if ( percent < 0 ) percent = 0;
+    
+    servoManager->write( pin , percent/100 * abs(OPEN_PERCENT - CLOSE_PERCENT) + min(CLOSE_PERCENT,OPEN_PERCENT) );
+}
