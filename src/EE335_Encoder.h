@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 #include "Constants/Constants.h"
-#include "TimerControllers.h"
+#include "CustomTimers.h"
 #include "CustomInterrupts.h"
 
 #if !defined( __AVR_ATmega328P__ ) && !defined( __AVR_ATmega2560__ )
@@ -11,19 +11,23 @@
 #endif
 
 class Encoder {
-	public:
-		Encoder( uint8_t pin , uint8_t timer , uint8_t thread , bool usePCInt , float wheelCircumference , uint8_t holesPerRevolution );
+    public:
+        Encoder( uint8_t pin , uint8_t timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution );
+        Encoder( uint8_t pin , BaseTimer16 *timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution );
         float getSpeed();
-	
-	private:
+        void kill();
+    
+    private:
         uint8_t pin;
-        BaseTimer16 *timer;
         uint8_t thread;
-        float factor;
         uint16_t period;
+        void init( float wheelCircumference , uint8_t holesPerRevolution );
+        BaseTimer16 *timer;
+        bool timerReserved;
+        float factor;
         static void onRisingEdge( void *object );
         static void onWrap( void *object );
-		
+        
 };
 
 #endif

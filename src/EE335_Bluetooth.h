@@ -36,6 +36,7 @@ class Bluetooth {
     
     private:
         HardwareSerial *btSerial;
+        bool noSerial;
         uint8_t rxMode;
         void getControllerInstruction();
         void getPlainTextInstruction();

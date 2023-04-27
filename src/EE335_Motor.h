@@ -9,14 +9,14 @@
 #endif
 
 class Motor {
-	public:
-		Motor( uint8_t pwmPin , uint8_t directionPin1 , uint8_t directionPin2 );
-		void setPwm( uint8_t dutyCycle );
-		void setDirection( uint8_t dutyCycle );
+    public:
+        Motor( uint8_t pwmPin , uint8_t directionPin1 , uint8_t directionPin2 );
+        void setPwm( uint8_t dutyCycle );
+        void setDirection( uint8_t dutyCycle );
         
-	private:
-		uint8_t pwmPin;
-		uint8_t directionPin1;
+    private:
+        uint8_t pwmPin;
+        uint8_t directionPin1;
         uint8_t directionPin2;
 };
 
