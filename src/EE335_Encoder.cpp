@@ -3,6 +3,8 @@
 Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution ):
     pin( pin ) ,
     thread( thread ) ,
+    wheelCircumference( wheelCircumference ) ,
+    holesPerRevolution( holesPerRevolution ) ,
     period( UINT16_MAX )
 {
     switch ( timer ) {
@@ -14,20 +16,18 @@ Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , float wheelCirc
 #endif
         default: timerReserved = false; return;
     }
-    
-    init( wheelCircumference , holesPerRevolution );
 }
 
 Encoder::Encoder( uint8_t pin , BaseTimer16 *timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution ):
     pin( pin ) ,
     thread( thread ) ,
+    wheelCircumference( wheelCircumference ) ,
+    holesPerRevolution( holesPerRevolution ) ,
     period( UINT16_MAX ) ,
     timer( timer )
-{
-    init( wheelCircumference , holesPerRevolution );
-}
+{}
 
-void Encoder::init( float wheelCircumference , uint8_t holesPerRevolution ) {
+void Encoder::begin() {
     if ( timer->isFree() ) {
         timer->reserve();
         timerReserved = true;
