@@ -28,8 +28,7 @@ Encoder::Encoder( uint8_t pin , BaseTimer16 *timer , uint8_t thread , float whee
 {}
 
 void Encoder::begin() {
-    if ( timer->isFree() ) {
-        timer->reserve();
+    if ( timer->reserve() ) {
         timerReserved = true;
     } else {
         timerReserved = false;
