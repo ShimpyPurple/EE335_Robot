@@ -37,12 +37,8 @@ Encoder::Encoder( uint8_t pin , GenericTimer *timer , uint8_t thread , float whe
 {}
 
 void Encoder::begin() {
-    if ( timer->reserve() ) {
-        timerReserved = true;
-    } else {
-        timerReserved = false;
-        return;
-    }
+    timerReserved = timer->reserve();
+    if ( !timerReserved ) return;
     
     timer->setMode( NORMAL );
     timer->setClockSource( CLOCK_1024 );
