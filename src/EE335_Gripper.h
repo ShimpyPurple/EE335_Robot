@@ -20,6 +20,7 @@ class Gripper {
         Gripper( uint8_t pin , BaseTimer8Async *timer8 );
         Gripper( uint8_t pin , GenericTimer *timer );
         
+        void begin();
         void open();
         void close();
         void write( float percent );
