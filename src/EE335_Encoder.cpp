@@ -5,20 +5,29 @@ Encoder::Encoder( uint8_t pin , uint8_t timer , uint8_t thread , float wheelCirc
     thread( thread ) ,
     wheelCircumference( wheelCircumference ) ,
     holesPerRevolution( holesPerRevolution ) ,
-    period( UINT16_MAX )
-{
-    switch ( timer ) {
-        case TIMER_1: this->timer = &Timer1; break;
-#if defined( __AVR_ATmega2560__ )
-        case TIMER_3: this->timer = &Timer3; break;
-        case TIMER_4: this->timer = &Timer4; break;
-        case TIMER_5: this->timer = &Timer5; break;
-#endif
-        default: timerReserved = false; return;
-    }
-}
+    period( UINT16_MAX ) ,
+    timer( new GenericTimer(timer , true) )
+{}
 
-Encoder::Encoder( uint8_t pin , BaseTimer16 *timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution ):
+Encoder::Encoder( uint8_t pin , BaseTimer16 *timer16 , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution ):
+    pin( pin ) ,
+    thread( thread ) ,
+    wheelCircumference( wheelCircumference ) ,
+    holesPerRevolution( holesPerRevolution ) ,
+    period( UINT16_MAX ) ,
+    timer( new GenericTimer(timer16) )
+{}
+
+Encoder::Encoder( uint8_t pin , BaseTimer8Async *timer8 , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution ):
+    pin( pin ) ,
+    thread( thread ) ,
+    wheelCircumference( wheelCircumference ) ,
+    holesPerRevolution( holesPerRevolution ) ,
+    period( UINT16_MAX ) ,
+    timer( new GenericTimer(timer8 , true) )
+{}
+
+Encoder::Encoder( uint8_t pin , GenericTimer *timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution ):
     pin( pin ) ,
     thread( thread ) ,
     wheelCircumference( wheelCircumference ) ,
@@ -62,11 +71,11 @@ void Encoder::kill() {
 
 static void Encoder::onRisingEdge( void *object ) {
     Encoder *encoder = ( Encoder* )( object );
-    BaseTimer16 *timer = encoder->timer;
+    GenericTimer *timer = encoder->timer;
     
     uint8_t interrupt;
-    uint16_t (BaseTimer16::*getOutputCompare)() = nullptr;
-    void (BaseTimer16::*setOutputCompare)( uint16_t ) = nullptr;
+    uint16_t (GenericTimer::*getOutputCompare)() = nullptr;
+    void (GenericTimer::*setOutputCompare)( uint16_t ) = nullptr;
     
     switch ( encoder->thread ) {
         case THREAD_A: interrupt = COMPARE_MATCH_A; getOutputCompare = &timer->getOutputCompareA; setOutputCompare = &timer->setOutputCompareA; break;
