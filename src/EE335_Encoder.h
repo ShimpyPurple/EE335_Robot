@@ -17,7 +17,6 @@ class Encoder {
         Encoder( uint8_t pin , BaseTimer8Async *timer8 , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution );
         Encoder( uint8_t pin , GenericTimer *timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution );
         float getSpeed();
-        void kill();
         void begin();
     
     private:
@@ -27,7 +26,6 @@ class Encoder {
         uint8_t holesPerRevolution;
         uint16_t period;
         GenericTimer *timer;
-        bool timerReserved;
         float factor;
         static void onRisingEdge( void *object );
         static void onWrap( void *object );

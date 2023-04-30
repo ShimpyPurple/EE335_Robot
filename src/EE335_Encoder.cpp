@@ -37,9 +37,6 @@ Encoder::Encoder( uint8_t pin , GenericTimer *timer , uint8_t thread , float whe
 {}
 
 void Encoder::begin() {
-    timerReserved = timer->reserve();
-    if ( !timerReserved ) return;
-    
     timer->setMode( NORMAL );
     timer->setClockSource( CLOCK_1024 );
     
@@ -57,12 +54,6 @@ void Encoder::begin() {
 
 float Encoder::getSpeed() {
     return factor / period;
-}
-
-void Encoder::kill() {
-    if ( timerReserved ) {
-        timer->release();
-    }
 }
 
 static void Encoder::onRisingEdge( void *object ) {
