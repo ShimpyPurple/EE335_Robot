@@ -29,7 +29,7 @@ void Motor::setPwm( uint8_t val ) {
 
 void Motor::setDirection( uint8_t direction ) {
     if ( adafruitDCMotor == nullptr ) {
-        switch ( direction ):
+        switch ( direction ) {
             case FORWARD:
                 digitalWrite( dirPin2 , LOW );
                 digitalWrite( dirPin1 , HIGH );
@@ -42,6 +42,7 @@ void Motor::setDirection( uint8_t direction ) {
                 digitalWrite( dirPin1 , LOW );
                 digitalWrite( dirPin2 , LOW );
                 break;
+        }
     } else {
         adafruitDCMotor->run( direction );
     }
