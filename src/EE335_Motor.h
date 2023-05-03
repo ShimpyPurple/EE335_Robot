@@ -16,7 +16,7 @@ class Motor {
         Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 );
         void begin();
         void setPwm( uint8_t dutyCycle );
-        void setDirection( uint8_t dutyCycle );
+        void setDirection( uint8_t direction );
         
     private:
         Adafruit_DCMotor *adafruitDCMotor;
