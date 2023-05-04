@@ -11,6 +11,7 @@
 class Bluetooth {
     public:
         Bluetooth( uint8_t serialPort , uint8_t rxMode );
+        void begin();
         void getInstruction();
         struct {
             uint8_t rightJoystickRadius = 0;

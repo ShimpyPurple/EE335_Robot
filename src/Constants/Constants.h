@@ -1,4 +1,3 @@
-
 #include "Arduino.h"
 
 // Serial sources
@@ -38,10 +37,6 @@
 #define SELECT 2
 #define START  3
 #define MODE   4
-
-// Motor Directions
-#define FORWARD HIGH
-#define BACKWARD LOW
 
 // Timer Threads
 #define THREAD_A 0

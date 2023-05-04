@@ -13,7 +13,9 @@ Bluetooth::Bluetooth( uint8_t serialPort , uint8_t rxMode ):
 #endif
         default: noSerial = true; return;
     }
+}
 
+void Bluetooth::begin() {
     btSerial->begin( 9600 );
 }
 

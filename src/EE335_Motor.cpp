@@ -1,22 +1,49 @@
 #include "EE335_Motor.h"
 
-Motor::Motor( uint8_t pwmPin , uint8_t directionPin1 , uint8_t directionPin2 ):
+Motor::Motor( Adafruit_DCMotor *adafruitDCMotor ):
+    adafruitDCMotor( adafruitDCMotor )
+{}
+
+Motor::Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 ):
+    adafruitDCMotor( nullptr ) ,
     pwmPin( pwmPin ) ,
-    directionPin1( directionPin1 ) ,
-    directionPin2( directionPin2 )
-{
-    pinMode( pwmPin        , OUTPUT );
-    pinMode( directionPin1 , OUTPUT );
-    pinMode( directionPin2 , OUTPUT );
-    
-    setDirection( FORWARD );
+    dirPin1( dirPin1 ) ,
+    dirPin2( dirPin2 )
+{}
+
+void Motor::begin() {
+    if ( adafruitDCMotor == nullptr ) {
+        pinMode( pwmPin  , OUTPUT );
+        pinMode( dirPin1 , OUTPUT );
+        pinMode( dirPin2 , OUTPUT );
+    }
 }
 
-void Motor::setPwm( uint8_t dutyCycle ) {
-    analogWrite( pwmPin , dutyCycle );
+void Motor::setPwm( uint8_t val ) {
+    if ( adafruitDCMotor == nullptr ) {
+        analogWrite( pwmPin , val );
+    } else {
+        adafruitDCMotor->setSpeed( val );
+    }
 }
 
 void Motor::setDirection( uint8_t direction ) {
-    digitalWrite( directionPin1 , direction );
-    digitalWrite( directionPin2 , !direction );
+    if ( adafruitDCMotor == nullptr ) {
+        switch ( direction ) {
+            case FORWARD:
+                digitalWrite( dirPin2 , LOW );
+                digitalWrite( dirPin1 , HIGH );
+                break;
+            case BACKWARD:
+                digitalWrite( dirPin1 , LOW );
+                digitalWrite( dirPin2 , HIGH );
+                break;
+            case RELEASE:
+                digitalWrite( dirPin1 , LOW );
+                digitalWrite( dirPin2 , LOW );
+                break;
+        }
+    } else {
+        adafruitDCMotor->run( direction );
+    }
 }
