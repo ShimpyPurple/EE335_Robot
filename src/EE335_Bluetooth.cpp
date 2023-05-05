@@ -58,7 +58,7 @@ void Bluetooth::getControllerInstruction() {
             ControllerState.rightJoystickAngle  = (float)( inByte - R6_START ) / ( R7_START - R6_START );
         } else {
             ControllerState.rightJoystickRadius = 7;
-            ControllerState.rightJoystickAngle  = (float)( inByte - R7_START ) / ( 0 - R7_START );
+            ControllerState.rightJoystickAngle  = (float)( inByte - R7_START ) / ( 0x100 - R7_START );
         }
         if ( ControllerState.rightJoystickAngle > 0.5 ) {
             ControllerState.rightJoystickAngle -= 1;
@@ -92,7 +92,7 @@ void Bluetooth::getControllerInstruction() {
             ControllerState.leftJoystickAngle  = (float)( inByte - R6_START ) / ( R7_START - R6_START );
         } else {
             ControllerState.leftJoystickRadius = 7;
-            ControllerState.leftJoystickAngle  = (float)( inByte - R7_START ) / ( 0 - R7_START );
+            ControllerState.leftJoystickAngle  = (float)( inByte - R7_START ) / ( 0x100 - R7_START );
         }
         if ( ControllerState.leftJoystickAngle > 0.5 ) {
             ControllerState.leftJoystickAngle -= 1;
