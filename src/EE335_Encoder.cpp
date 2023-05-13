@@ -37,7 +37,9 @@ Encoder::Encoder( uint8_t pin , GenericTimer *timer , uint8_t thread , float whe
 {}
 
 void Encoder::begin() {
-    timer->setMode( NORMAL );
+    pinMode( pin , INPUT );
+    
+    timer->setMode( WGM_NORMAL );
     timer->setClockSource( CLOCK_1024 );
     
     factor = timer->getTickRate() * wheelCircumference / holesPerRevolution;
@@ -50,9 +52,11 @@ void Encoder::begin() {
         case THREAD_C: timer->attachInterrupt( COMPARE_MATCH_C , onWrap , this ); break;
 #endif
     }
+    
 }
 
 float Encoder::getSpeed() {
+    if ( period == UINT16_MAX ) return 0;
     return factor / period;
 }
 
@@ -73,6 +77,7 @@ static void Encoder::onRisingEdge( void *object ) {
         default: return;
     }
     
+    
     if ( timer->interruptEnabled(interrupt) ) {
         uint16_t newPeriod = timer->getCounter() - ( timer->*getOutputCompare )();
         if ( newPeriod > 5 ) {
@@ -87,6 +92,7 @@ static void Encoder::onRisingEdge( void *object ) {
 static void Encoder::onWrap( void *object ) {
     Encoder *encoder = ( Encoder* )( object );
     encoder->period = UINT16_MAX;
+    
     switch ( encoder->thread ) {
         case THREAD_A: encoder->timer->disableInterrupt( COMPARE_MATCH_A ); break;
         case THREAD_B: encoder->timer->disableInterrupt( COMPARE_MATCH_B ); break;
