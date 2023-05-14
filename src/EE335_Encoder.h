@@ -10,25 +10,20 @@
 #warning "EE335_Encoder is only tested for ATmega328P and ATmega2560"
 #endif
 
+#define MAX_PERIOD 2000000
+
 class Encoder {
     public:
-        Encoder( uint8_t pin , uint8_t timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution );
-        Encoder( uint8_t pin , BaseTimer16 *timer16 , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution );
-        Encoder( uint8_t pin , BaseTimer8Async *timer8 , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution );
-        Encoder( uint8_t pin , GenericTimer *timer , uint8_t thread , float wheelCircumference , uint8_t holesPerRevolution );
+        Encoder( uint8_t pin , float wheelCircumference , uint8_t holesPerRevolution );
         float getSpeed();
         void begin();
     
     private:
         uint8_t pin;
-        uint8_t thread;
-        float wheelCircumference;
-        uint8_t holesPerRevolution;
-        uint16_t period;
-        GenericTimer *timer;
         float factor;
+        uint32_t lastEdge;
+        uint32_t period;
         static void onRisingEdge( void *object );
-        static void onWrap( void *object );
         
 };
 
