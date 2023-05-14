@@ -2,6 +2,7 @@
 #define EE335_Ultrasonic_h
 
 #include "Arduino.h"
+#include "CustomInterrupts.h"
 #include "CustomServos.h"
 #include "Constants/Constants.h"
 
@@ -11,16 +12,17 @@
 
 class Ultrasonic {
     public:
-        Ultrasonic( uint8_t trigPin , uint8_t echoPin , ServoManager *servoManager , float mach );
+        Ultrasonic( uint8_t trigPin , uint8_t echoPin , ServoManager *servoManager , float mach=343 );
         void begin();
-        float getDistance();
+        volatile float distance;
     
     private:
         uint8_t trigPin;
         uint8_t echoPin;
         ServoManager *servoManager;
         float mach;
-        float factor;
+        static void echoReceived( void *object , uint8_t edgeType );
+        volatile uint32_t echoStart;
     
 };
 
