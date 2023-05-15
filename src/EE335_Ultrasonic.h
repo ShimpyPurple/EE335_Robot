@@ -19,8 +19,10 @@ class Ultrasonic {
     private:
         uint8_t trigPin;
         uint8_t echoPin;
+        uint8_t servoPin;
         ServoManager *servoManager;
         float mach;
+        void setPosition( float percent );
         static void echoReceived( void *object , uint8_t edgeType );
         volatile uint32_t echoStart;
     
