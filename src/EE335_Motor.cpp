@@ -1,14 +1,22 @@
 #include "EE335_Motor.h"
 
 Motor::Motor( Adafruit_DCMotor *adafruitDCMotor ):
-    adafruitDCMotor( adafruitDCMotor )
+    adafruitDCMotor( adafruitDCMotor ) ,
+    pid( new PID(1,3) ) ,
+    cruiseEnabled( false ) ,
+    pwmToSet( 0 ) ,
+    updatePwmFlag( false )
 {}
 
 Motor::Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 ):
     adafruitDCMotor( nullptr ) ,
     pwmPin( pwmPin ) ,
     dirPin1( dirPin1 ) ,
-    dirPin2( dirPin2 )
+    dirPin2( dirPin2 ) ,
+    pid( new PID(1,3) ) ,
+    cruiseEnabled( false ) ,
+    pwmToSet( 0 ) ,
+    updatePwmFlag( false )
 {}
 
 void Motor::begin() {
@@ -45,5 +53,41 @@ void Motor::setDirection( uint8_t direction ) {
         }
     } else {
         adafruitDCMotor->run( direction );
+    }
+}
+
+void Motor::attachEncoder( Encoder *encoder ) {
+    this->encoder = encoder;
+}
+
+void Motor::enableCruise() {
+    cruiseEnabled = true;
+    cruiseID = runAfter(
+        50 ,
+        []( void *object ) {
+            Motor *motor = ( Motor* )( object );
+            motor->pwmToSet = motor->pid->getControlSignal( motor->encoder->getSpeed() );
+            motor->updatePwmFlag = true;
+        } ,
+        this ,
+        true
+    );
+}
+
+void Motor::setCruise( float speed ) {
+    pid->setSetPoint( speed );
+}
+
+void Motor::stopCruise() {
+    if ( cruiseEnabled ) {
+        cruiseEnabled = false;
+        runAfterCancel( cruiseID );
+    }
+}
+
+void Motor::updatePwm() {
+    if ( updatePwmFlag ) {
+        updatePwmFlag = false;
+        setPwm( pwmToSet );
     }
 }
