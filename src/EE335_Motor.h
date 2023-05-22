@@ -17,26 +17,27 @@ class Motor {
         Motor( Adafruit_DCMotor *adafruitDCMotor );
         Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 );
         void begin();
-        void setPwm( uint8_t dutyCycle );
         void setDirection( uint8_t direction );
+        void setPWM( uint8_t val );
+        void requestPWM( uint8_t val );
+        void updatePWM();
         void attachEncoder( Encoder *encoder );
         void enableCruise();
         void setCruise( float speed );
         void stopCruise();
-        void updatePwm();
         
     private:
         Adafruit_DCMotor *adafruitDCMotor;
         uint8_t pwmPin;
         uint8_t dirPin1;
         uint8_t dirPin2;
-        
         Encoder *encoder;
         PID *pid;
         bool cruiseEnabled;
         uint8_t cruiseID;
-        bool updatePwmFlag;
+        bool updatePWMFlag;
         uint8_t pwmToSet;
+    
 };
 
 #endif
