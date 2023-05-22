@@ -18,7 +18,7 @@ class Motor {
         Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 );
         void begin();
         void setDirection( uint8_t direction );
-        void requestDirection( uint8_t val );
+        void requestDirection( uint8_t direction );
         void setPWM( uint8_t val );
         void requestPWM( uint8_t val );
         void update();
