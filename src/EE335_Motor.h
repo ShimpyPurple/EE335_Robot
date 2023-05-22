@@ -18,9 +18,10 @@ class Motor {
         Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 );
         void begin();
         void setDirection( uint8_t direction );
+        void requestDirection( uint8_t val );
         void setPWM( uint8_t val );
         void requestPWM( uint8_t val );
-        void updatePWM();
+        void update();
         void attachEncoder( Encoder *encoder );
         void enableCruise();
         void setCruise( float speed );
@@ -31,12 +32,16 @@ class Motor {
         uint8_t pwmPin;
         uint8_t dirPin1;
         uint8_t dirPin2;
+        uint8_t currentDirection;
+        uint8_t directionToSet;
+        bool updateDirectionFlag;
+        uint8_t currentPWM;
+        uint8_t pwmToSet;
+        bool updatePWMFlag;
         Encoder *encoder;
         PID *pid;
         bool cruiseEnabled;
         uint8_t cruiseID;
-        bool updatePWMFlag;
-        uint8_t pwmToSet;
     
 };
 
