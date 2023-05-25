@@ -15,12 +15,14 @@
 class Encoder {
     public:
         Encoder( uint8_t pin , float wheelCircumference , uint8_t holesPerRevolution );
+        float getDistance();
         float getSpeed();
         void begin();
     
     private:
         uint8_t pin;
-        float factor;
+        float distancePerHole;
+        float distance;
         uint32_t lastEdge;
         uint32_t period;
         static void onRisingEdge( void *object );
