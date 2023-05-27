@@ -16,7 +16,7 @@ void PID::setSetPoint( float setPoint ) {
 
 float PID::getControlSignal( float processOutput ) {
     float error = setPoint - processOutput;
-    float derivative = ( error - prevSample ) / samplePeriod;
+    float derivative = ( error - prevError ) / samplePeriod;
     integral += error * samplePeriod;
     
     prevError = error;
