@@ -49,7 +49,7 @@ class Motor {
         uint8_t currentPWM;
         uint8_t pwmToSet;
         bool updatePWMFlag;
-        const Encoder *encoder;
+        Encoder *encoder;
         const PID *pid;
         bool cruiseEnabled;
         uint8_t cruiseID;
