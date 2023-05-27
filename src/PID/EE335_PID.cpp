@@ -21,5 +21,5 @@ float PID::getControlSignal( float processOutput ) {
     
     prevError = error;
     
-    return kp*error + ki*integral + ki*derivative;
+    return kp*error + ki*integral + kd*derivative;
 }
