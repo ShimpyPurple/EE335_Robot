@@ -9,16 +9,18 @@
 
 class PID {
     public:
-        PID( float kp , float ki );
+        PID( float kp , float ki , float kd , float samplePeriod );
         void setSetPoint( float setPoint );
         float getControlSignal( float processOutput );
     
     private:
-        float kp;
-        float ki;
-        float integral;
+        const float kp;
+        const float ki;
+        const float kd;
+        const float samplePeriod;
         float setPoint;
-        uint32_t prevSample;
+        float integral;
+        float prevError;
     
 };
 

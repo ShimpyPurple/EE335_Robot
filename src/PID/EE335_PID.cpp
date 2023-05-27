@@ -1,7 +1,13 @@
 #include "EE335_PID.h"
 
-PID::PID( float kp , float ki ):
-    kp( kp ) , ki( ki ) , setPoint( 0 )
+PID::PID( float kp , float ki , float kd , float samplePeriod ):
+    kp( kp ) ,
+    ki( ki ) ,
+    kd( kd ) ,
+    samplePeriod( samplePeriod ) ,
+    setPoint( 0 ) ,
+    integral( 0 ) ,
+    prevError( 0 )
 {}
 
 void PID::setSetPoint( float setPoint ) {
@@ -9,12 +15,11 @@ void PID::setSetPoint( float setPoint ) {
 }
 
 float PID::getControlSignal( float processOutput ) {
-    uint32_t ms = millis();
-    
     float error = setPoint - processOutput;
-    integral += error * ( ms - prevSample ) / 1000.0;
+    float derivative = ( error - prevSample ) / samplePeriod;
+    integral += error * samplePeriod;
     
-    prevSample = ms;
+    prevError = error;
     
-    return kp*error + ki*integral;
+    return kp*error + ki*integral + ki*derivative;
 }
