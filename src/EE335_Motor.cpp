@@ -4,7 +4,7 @@ Motor::Motor( MotorShield *motorShield , uint8_t motorNumber ):
     driverType( TYPE_CUSTOM_MOTOR_SHIELD ) ,
     motorShield( motorShield ) ,
     motorNumber( motorNumber ) ,
-    pid( new PID(1,3) ) ,
+    pid( new PID(MOTOR_KP , MOTOR_KI , MOTOR_KD , MOTOR_PID_SAMPLE_PERIOD*0.001) ) ,
     cruiseEnabled( false ) ,
     currentDirection( RELEASE ) ,
     directionToSet( 0 ) ,
@@ -17,7 +17,7 @@ Motor::Motor( MotorShield *motorShield , uint8_t motorNumber ):
 Motor::Motor( Adafruit_DCMotor *adafruitDCMotor ):
     driverType( TYPE_ADAFRUIT_DC_MOTOR ) ,
     adafruitDCMotor( adafruitDCMotor ) ,
-    pid( new PID(1,3) ) ,
+    pid( new PID(MOTOR_KP , MOTOR_KI , MOTOR_KD , MOTOR_PID_SAMPLE_PERIOD*0.001) ) ,
     cruiseEnabled( false ) ,
     currentDirection( RELEASE ) ,
     directionToSet( 0 ) ,
@@ -32,7 +32,7 @@ Motor::Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 ):
     pwmPin( pwmPin ) ,
     dirPin1( dirPin1 ) ,
     dirPin2( dirPin2 ) ,
-    pid( new PID(1,3) ) ,
+    pid( new PID(MOTOR_KP , MOTOR_KI , MOTOR_KD , MOTOR_PID_SAMPLE_PERIOD*0.001) ) ,
     cruiseEnabled( false ) ,
     currentDirection( RELEASE ) ,
     directionToSet( 0 ) ,
@@ -142,13 +142,13 @@ void Motor::enableCruise() {
     if ( cruiseEnabled ) return;
     cruiseEnabled = true;
     cruiseID = runAfter(
-        50 ,
+        MOTOR_PID_SAMPLE_PERIOD ,
         []( void *object ) {
             Motor *motor = ( Motor* )( object );
-            motor->requestPWM( motor->pid->getControlSignal(motor->encoder->getSpeed()) );
+            motor->requestPercent( motor->pid->getControlSignal(motor->encoder->getSpeed()) );
         } ,
         this ,
-        true
+        MOTOR_PID_SAMPLE_PERIOD
     );
 }
 

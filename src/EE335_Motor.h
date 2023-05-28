@@ -17,6 +17,11 @@
 #define TYPE_ADAFRUIT_DC_MOTOR 1
 #define TYPE_H_BRIDGE 3
 
+#define MOTOR_KP 1
+#define MOTOR_KI 5
+#define MOTOR_KD 0.0341
+#define MOTOR_PID_SAMPLE_PERIOD 50
+
 class Motor {
     public:
         Motor( MotorShield *motorShield , uint8_t motorNumber );
@@ -46,8 +51,8 @@ class Motor {
         uint8_t currentDirection;
         uint8_t directionToSet;
         bool updateDirectionFlag;
-        uint8_t currentPWM;
-        uint8_t pwmToSet;
+        uint16_t currentPWM;
+        uint16_t pwmToSet;
         bool updatePWMFlag;
         Encoder *encoder;
         const PID *pid;
