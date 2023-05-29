@@ -6,7 +6,7 @@ Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , M
     trigPin( trigPin ) ,
     echoPin( echoPin ) ,
     servoPin( servoPin ) ,
-    driverType( TYPE_CUSTOM_MOTOR_SHIELD ) ,
+    driverType( DRIVER_CUSTOM_MOTOR_SHIELD ) ,
     motorShield( motorShield ) ,
     mach( mach ) ,
     sweeping( NOT_SWEEPING )
@@ -16,7 +16,7 @@ Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , S
     trigPin( trigPin ) ,
     echoPin( echoPin ) ,
     servoPin( servoPin ) ,
-    driverType( TYPE_CUSTOM_SERVO_MANAGER ) ,
+    driverType( DRIVER_CUSTOM_SERVO_MANAGER ) ,
     servoManager( servoManager ) ,
     mach( mach ) ,
     sweeping( NOT_SWEEPING )
@@ -25,7 +25,7 @@ Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , S
 void Ultrasonic::begin() {
     pinMode( trigPin , OUTPUT );
     pinMode( echoPin , INPUT );
-    if ( driverType == TYPE_CUSTOM_SERVO_MANAGER ) {
+    if ( driverType == DRIVER_CUSTOM_SERVO_MANAGER ) {
         pinMode( servoPin , OUTPUT );
     }
     
@@ -46,10 +46,10 @@ void Ultrasonic::trigger( void *object ) {
 
 void Ultrasonic::setStep( uint8_t step ) {
     switch ( driverType ) {
-        case TYPE_CUSTOM_MOTOR_SHIELD:
+        case DRIVER_CUSTOM_MOTOR_SHIELD:
             motorShield->writeServo32( servoPin , (float)32/(NUM_SWEEP_STEPS-1) * step );
             break;
-        case TYPE_CUSTOM_SERVO_MANAGER:
+        case DRIVER_CUSTOM_SERVO_MANAGER:
             servoManager->write( servoPin , (float)step/(NUM_SWEEP_STEPS-1) * 100 );
             break;
         default: return;

@@ -18,8 +18,8 @@
 #define SWEEPING_DOWN 1
 #define SWEEPING_UP 2
 
-#define TYPE_CUSTOM_MOTOR_SHIELD 0
-#define TYPE_CUSTOM_SERVO_MANAGER 1
+#define DRIVER_CUSTOM_MOTOR_SHIELD 0
+#define DRIVER_CUSTOM_SERVO_MANAGER 1
 
 class Ultrasonic {
     public:

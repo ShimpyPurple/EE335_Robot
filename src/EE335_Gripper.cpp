@@ -1,45 +1,43 @@
 #include "EE335_Gripper.h"
 
-Gripper::Gripper( uint8_t pin , ServoManager *servoManager ):
+Gripper::Gripper( uint8_t pin , MotorShield *motorShield ):
     pin( pin ) ,
+    driverType( DRIVER_CUSTOM_MOTOR_SHIELD ) ,
     servoManager( servoManager )
 {}
 
-Gripper::Gripper( uint8_t pin , uint8_t timer ):
+Gripper::Gripper( uint8_t pin , ServoManager *servoManager ):
     pin( pin ) ,
-    servoManager( new ServoManager(timer) )
-{}
-
-Gripper::Gripper( uint8_t pin , BaseTimer16 *timer16 ):
-    pin( pin ) ,
-    servoManager( new ServoManager(timer16) )
-{}
-
-Gripper::Gripper( uint8_t pin , BaseTimer8Async *timer8 ):
-    pin( pin ) ,
-    servoManager( new ServoManager(timer8) )
-{}
-
-Gripper::Gripper( uint8_t pin , GenericTimer *timer ):
-    pin( pin ) ,
-    servoManager( new ServoManager(timer) )
+    driverType( DRIVER_CUSTOM_SERVO_MANAGER ) ,
+    servoManager( servoManager )
 {}
 
 void Gripper::begin() {
-    servoManager->begin();
+    if ( driverType == DRIVER_CUSTOM_SERVO_MANAGER ) {
+        pinMode( pin , OUTPUT );
+    }
 }
 
 void Gripper::open() {
-    servoManager->write( pin , OPEN_PERCENT );
+    switch ( driverType ) {
+        case DRIVER_CUSTOM_MOTOR_SHIELD:  motorShield->writeServo( pin , OPEN_PERCENT ); break;
+        case DRIVER_CUSTOM_SERVO_MANAGER: servoManager->write(     pin , OPEN_PERCENT ); break;
+    }
 }
 
 void Gripper::close() {
-    servoManager->write( pin , CLOSE_PERCENT );
+    switch ( driverType ) {
+        case DRIVER_CUSTOM_MOTOR_SHIELD:  motorShield->writeServo( pin , CLOSE_PERCENT ); break;
+        case DRIVER_CUSTOM_SERVO_MANAGER: servoManager->write(     pin , CLOSE_PERCENT ); break;
+    }
 }
 
 void Gripper::write( float percent ) {
     if ( percent > 100 ) percent = 100;
     if ( percent < 0 ) percent = 0;
     
-    servoManager->write( pin , percent/100 * abs(OPEN_PERCENT - CLOSE_PERCENT) + min(CLOSE_PERCENT,OPEN_PERCENT) );
+    switch ( driverType ) {
+        case DRIVER_CUSTOM_MOTOR_SHIELD:  motorShield->writeServo( pin , percent/100 * abs(OPEN_PERCENT - CLOSE_PERCENT) + min(CLOSE_PERCENT,OPEN_PERCENT) ); break;
+        case DRIVER_CUSTOM_SERVO_MANAGER: servoManager->write(     pin , percent/100 * abs(OPEN_PERCENT - CLOSE_PERCENT) + min(CLOSE_PERCENT,OPEN_PERCENT) ); break;
+    }
 }
