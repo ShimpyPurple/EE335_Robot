@@ -1,9 +1,6 @@
 #include "EE335_Bluetooth.h"
 
-Bluetooth::Bluetooth( uint8_t serialPort , uint8_t rxMode ):
-    noSerial( false ) ,
-    rxMode( rxMode )
-{
+Bluetooth::Bluetooth( uint8_t serialPort ) {
     switch ( serialPort ) {
         case SERIAL_0: btSerial = &Serial;  break;
 #if defined( __AVR_ATmega2560__ )
@@ -11,7 +8,7 @@ Bluetooth::Bluetooth( uint8_t serialPort , uint8_t rxMode ):
         case SERIAL_2: btSerial = &Serial2; break;
         case SERIAL_3: btSerial = &Serial3; break;
 #endif
-        default: noSerial = true; return;
+        default: btSerial = &Serial;  break;
     }
 }
 
@@ -20,17 +17,9 @@ void Bluetooth::begin() {
 }
 
 void Bluetooth::getInstruction() {
-    if ( noSerial ) return;
-    switch ( rxMode ) {
-        case CONTROLLER: getControllerInstruction(); break;
-        case PLAIN_TEXT: getPlainTextInstruction();  break;
-    }
-}
-
-void Bluetooth::getControllerInstruction() {
     waitForSerial();
+    
     uint8_t header = btSerial->read();
-    if ( !(header & ( 1<<CHECKBIT )) ) return;
     
     if ( header & (1<<R_JOYSTICK) ) {
         waitForSerial();
@@ -107,31 +96,27 @@ void Bluetooth::getControllerInstruction() {
         ControllerState.leftTrigger  = inByte >> 4;
     }
     
-    if ( header & (1<<GAMEPAD) ) {
+    if ( header & (1<<DPAD) ) {
         waitForSerial();
         uint8_t inByte = btSerial->read();
-        ControllerState.buttonA = ( inByte & (1<<BUTTON_A) );
-        ControllerState.buttonB = ( inByte & (1<<BUTTON_B) );
-        ControllerState.buttonX = ( inByte & (1<<BUTTON_X) );
-        ControllerState.buttonY = ( inByte & (1<<BUTTON_Y) );
         ControllerState.dPadUp    = ( inByte & (1<<DPAD_UP)    );
         ControllerState.dPadDown  = ( inByte & (1<<DPAD_DOWN)  );
         ControllerState.dPadRight = ( inByte & (1<<DPAD_RIGHT) );
         ControllerState.dPadLeft  = ( inByte & (1<<DPAD_LEFT)  );
     }
     
-    if ( header & (1<<OTHER) ) {
+    if ( header & (1<<BUTTONS) ) {
         waitForSerial();
         uint8_t inByte = btSerial->read();
+        ControllerState.buttonA = ( inByte & (1<<BUTTON_A) );
+        ControllerState.buttonB = ( inByte & (1<<BUTTON_B) );
+        ControllerState.buttonX = ( inByte & (1<<BUTTON_X) );
+        ControllerState.buttonY = ( inByte & (1<<BUTTON_Y) );
         ControllerState.rightBumper = ( inByte & (1<<R_BUMPER) );
         ControllerState.leftBumper  = ( inByte & (1<<L_BUMPER) );
         ControllerState.select = ( inByte & (1<<SELECT) );
         ControllerState.start  = ( inByte & (1<<START)  );
-        ControllerState.mode   = ( inByte & (1<<MODE)   );
     }
-}
-
-void Bluetooth::getPlainTextInstruction() {
     
 }
 

@@ -2,15 +2,47 @@
 #define EE335_Bluetooth_h
 
 #include "Arduino.h"
-#include "Constants/Constants.h"
 
 #if !defined( __AVR_ATmega328P__ ) && !defined( __AVR_ATmega2560__ )
 #warning "EE335_Bluetooth is only tested for ATmega328P and ATmega2560"
 #endif
 
+#define SERIAL_0 0
+#define SERIAL_1 1
+#define SERIAL_2 2
+#define SERIAL_3 3
+
+#define R_JOYSTICK 0
+#define L_JOYSTICK 1
+#define R1_START 0x04
+#define R2_START 0x10
+#define R3_START 0x24
+#define R4_START 0x40
+#define R5_START 0x64
+#define R6_START 0x90
+#define R7_START 0xC4
+
+#define TRIGGERS 2
+
+#define DPAD 3
+#define DPAD_UP    0
+#define DPAD_DOWN  1
+#define DPAD_RIGHT 2
+#define DPAD_LEFT  3
+
+#define BUTTONS 4
+#define BUTTON_A 0
+#define BUTTON_B 1
+#define BUTTON_X 2
+#define BUTTON_Y 3
+#define R_BUMPER 4
+#define L_BUMPER 5
+#define SELECT 6
+#define START  7
+
 class Bluetooth {
     public:
-        Bluetooth( uint8_t serialPort , uint8_t rxMode );
+        Bluetooth( uint8_t serialPort );
         void begin();
         void getInstruction();
         struct {
@@ -20,8 +52,6 @@ class Bluetooth {
             float leftJoystickAngle  = 0;
             uint8_t rightTrigger = 0;
             uint8_t leftTrigger  = 0;
-            bool rightBumper = false;
-            bool leftBumper  = false;
             bool dPadUp    = false;
             bool dPadDown  = false;
             bool dPadRight = false;
@@ -30,18 +60,16 @@ class Bluetooth {
             bool buttonB = false;
             bool buttonX = false;
             bool buttonY = false;
-            bool select = false; 
+            bool rightBumper = false;
+            bool leftBumper  = false;
+            bool select = false;
             bool start  = false;
-            bool mode   = false;
         } ControllerState;
     
     private:
         HardwareSerial *btSerial;
-        bool noSerial;
-        uint8_t rxMode;
-        void getControllerInstruction();
-        void getPlainTextInstruction();
         void waitForSerial();
+    
 };
 
 #endif
