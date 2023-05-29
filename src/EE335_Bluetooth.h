@@ -12,34 +12,6 @@
 #define SERIAL_2 2
 #define SERIAL_3 3
 
-#define R_JOYSTICK 0
-#define L_JOYSTICK 1
-#define R1_START 0x04
-#define R2_START 0x10
-#define R3_START 0x24
-#define R4_START 0x40
-#define R5_START 0x64
-#define R6_START 0x90
-#define R7_START 0xC4
-
-#define TRIGGERS 2
-
-#define DPAD 3
-#define DPAD_UP    0
-#define DPAD_DOWN  1
-#define DPAD_RIGHT 2
-#define DPAD_LEFT  3
-
-#define BUTTONS 4
-#define BUTTON_A 0
-#define BUTTON_B 1
-#define BUTTON_X 2
-#define BUTTON_Y 3
-#define R_BUMPER 4
-#define L_BUMPER 5
-#define SELECT 6
-#define START  7
-
 #define ALL_HEADINGS 0xFF
 
 class Bluetooth {

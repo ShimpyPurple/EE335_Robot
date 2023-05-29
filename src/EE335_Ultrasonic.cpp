@@ -1,5 +1,12 @@
 #include "EE335_Ultrasonic.h"
 
+#define NOT_SWEEPING 0
+#define SWEEPING_DOWN 1
+#define SWEEPING_UP 2
+
+#define DRIVER_CUSTOM_MOTOR_SHIELD 0
+#define DRIVER_CUSTOM_SERVO_MANAGER 1
+
 uint16_t triggerCount = 0;
 
 Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , MotorShield *motorShield , float mach ):

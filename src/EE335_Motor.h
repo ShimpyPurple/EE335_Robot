@@ -12,16 +12,6 @@
 #warning "EE335_Motor is only tested for ATmega328P and ATmega2560"
 #endif
 
-#define DRIVER_UNDETERMINED 0
-#define DRIVER_CUSTOM_MOTOR_SHIELD 1
-#define DRIVER_ADAFRUIT_DC_MOTOR 2
-#define DRIVER_H_BRIDGE 3
-
-#define MOTOR_KP 1
-#define MOTOR_KI 5
-#define MOTOR_KD 0.0341
-#define MOTOR_PID_SAMPLE_PERIOD 50
-
 class Motor {
     friend class MotorPair;
     

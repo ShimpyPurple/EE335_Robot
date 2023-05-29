@@ -9,8 +9,6 @@
 #warning "EE335_Encoder is only tested for ATmega328P and ATmega2560"
 #endif
 
-#define MAX_PERIOD 2000000
-
 class Encoder {
     public:
         Encoder( uint8_t pin , float wheelCircumference , uint8_t holesPerRevolution );

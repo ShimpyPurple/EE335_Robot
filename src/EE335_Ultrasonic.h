@@ -11,15 +11,6 @@
 #endif
 
 #define NUM_SWEEP_STEPS 17
-#define SWEEP_START 0
-#define SWEEP_END 95
-
-#define NOT_SWEEPING 0
-#define SWEEPING_DOWN 1
-#define SWEEPING_UP 2
-
-#define DRIVER_CUSTOM_MOTOR_SHIELD 0
-#define DRIVER_CUSTOM_SERVO_MANAGER 1
 
 class Ultrasonic {
     public:

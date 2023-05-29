@@ -1,5 +1,7 @@
 #include "EE335_Encoder.h"
 
+#define MAX_PERIOD 2000000
+
 Encoder::Encoder( uint8_t pin , float wheelCircumference , uint8_t holesPerRevolution ):
     pin( pin ) ,
     distancePerHole( wheelCircumference / holesPerRevolution ) ,

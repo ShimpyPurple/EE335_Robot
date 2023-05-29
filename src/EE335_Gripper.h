@@ -9,12 +9,6 @@
 #warning "EE335_Gripper is only tested for ATmega328P and ATmega2560"
 #endif
 
-#define DRIVER_CUSTOM_MOTOR_SHIELD 0
-#define DRIVER_CUSTOM_SERVO_MANAGER 1
-
-#define CLOSE_PERCENT 25
-#define OPEN_PERCENT 75
-
 class Gripper {
     public:
         Gripper( uint8_t pin , MotorShield *motorShield );

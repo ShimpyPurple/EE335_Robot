@@ -1,5 +1,11 @@
 #include "EE335_Gripper.h"
 
+#define DRIVER_CUSTOM_MOTOR_SHIELD 0
+#define DRIVER_CUSTOM_SERVO_MANAGER 1
+
+#define CLOSE_PERCENT 25
+#define OPEN_PERCENT 75
+
 Gripper::Gripper( uint8_t pin , MotorShield *motorShield ):
     pin( pin ) ,
     driverType( DRIVER_CUSTOM_MOTOR_SHIELD ) ,
