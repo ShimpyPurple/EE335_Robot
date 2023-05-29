@@ -1,13 +1,22 @@
 #include "EE335_Ultrasonic.h"
 
-int stepPositions[NUM_SWEEP_STEPS] = {
-    0 , 5 , 11 , 16 , 21 , 27 , 32 , 38 , 43 , 49 , 56 , 62 , 69 , 75 , 81 , 88 , 94
-};
+uint16_t triggerCount = 0;
+
+Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , MotorShield *motorShield , float mach=343 ):
+    trigPin( trigPin ) ,
+    echoPin( echoPin ) ,
+    servoPin( servoPin ) ,
+    driverType( TYPE_CUSTOM_MOTOR_SHIELD ) ,
+    motorShield( motorShield ) ,
+    mach( mach ) ,
+    sweeping( NOT_SWEEPING )
+{}
 
 Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , ServoManager *servoManager , float mach=343 ):
     trigPin( trigPin ) ,
     echoPin( echoPin ) ,
     servoPin( servoPin ) ,
+    driverType( TYPE_CUSTOM_SERVO_MANAGER ) ,
     servoManager( servoManager ) ,
     mach( mach ) ,
     sweeping( NOT_SWEEPING )
@@ -16,9 +25,10 @@ Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , S
 void Ultrasonic::begin() {
     pinMode( trigPin , OUTPUT );
     pinMode( echoPin , INPUT );
-    pinMode( servoPin , OUTPUT );
+    if ( driverType == TYPE_CUSTOM_SERVO_MANAGER ) {
+        pinMode( servoPin , OUTPUT );
+    }
     
-    setStep( NUM_SWEEP_STEPS/2 );
     attachInterruptCustom( echoPin , CHANGE , echoReceived , this );
 }
 
@@ -28,18 +38,38 @@ static void Ultrasonic::trigger( void *object ) {
     digitalWrite( ultrasonic->trigPin , HIGH );
     delayMicroseconds( 10 );
     digitalWrite( ultrasonic->trigPin , LOW );
+    
+    if ( ++triggerCount >= 1000 ) {
+        ultrasonic->stopSweep();
+    }
 }
 
 void Ultrasonic::setStep( uint8_t step ) {
-    // servoManager->write( servoPin , SWEEP_START + (float)step/NUM_SWEEP_STEPS * (SWEEP_END - SWEEP_START) );
-    servoManager->write( servoPin , stepPositions[step] );
+    switch ( driverType ) {
+        case TYPE_CUSTOM_MOTOR_SHIELD:
+            motorShield->writeServo32( servoPin , (float)32/(NUM_SWEEP_STEPS-1) * step );
+            break;
+        case TYPE_CUSTOM_SERVO_MANAGER:
+            servoManager->write( servoPin , (float)step/(NUM_SWEEP_STEPS-1) * 100 );
+            break;
+        default: return;
+    }
     sweepStep = step;
 }
 
 void Ultrasonic::startSweep() {
-    sweeping = SWEEPING_UP;
-    setStep( 0 );
-    runAfter( 150 , trigger , this , true );
+    if( sweeping == NOT_SWEEPING ) {
+        sweeping = SWEEPING_UP;
+        setStep( 0 );
+        sweepID = runAfter( 1000 , trigger , this , 100 );
+    }
+}
+
+void Ultrasonic::stopSweep() {
+    if( sweeping != NOT_SWEEPING ) {
+        sweeping = NOT_SWEEPING;
+        runAfterCancel( sweepID );
+    }
 }
 
 static void Ultrasonic::echoReceived( void *object , uint8_t edgeType ) {
@@ -60,7 +90,6 @@ static void Ultrasonic::echoReceived( void *object , uint8_t edgeType ) {
                     } else {
                         ultrasonic->setStep( ultrasonic->sweepStep - 1 );
                     }
-                    // runAfter( 100 , trigger , object );
                     break;
                 case SWEEPING_UP:
                     if ( ultrasonic->sweepStep == NUM_SWEEP_STEPS-1 ) {
@@ -69,7 +98,6 @@ static void Ultrasonic::echoReceived( void *object , uint8_t edgeType ) {
                     } else {
                         ultrasonic->setStep( ultrasonic->sweepStep + 1 );
                     }
-                    // runAfter( 100 , trigger , object );
                     break;
             }
             break;

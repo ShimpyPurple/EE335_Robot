@@ -3,8 +3,8 @@
 
 #include "Arduino.h"
 #include "CustomInterrupts.h"
+#include "CustomMotorShield.h"
 #include "CustomServos.h"
-#include "Constants/Constants.h"
 
 #if !defined( __AVR_ATmega328P__ ) && !defined( __AVR_ATmega2560__ )
 #warning "EE335_Ultrasonic is only tested for ATmega328P and ATmega2560"
@@ -18,25 +18,33 @@
 #define SWEEPING_DOWN 1
 #define SWEEPING_UP 2
 
+#define TYPE_CUSTOM_MOTOR_SHIELD 0
+#define TYPE_CUSTOM_SERVO_MANAGER 1
+
 class Ultrasonic {
     public:
+        Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , MotorShield *motorShield , float mach=343 );
         Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , ServoManager *servoManager , float mach=343 );
         void begin();
         volatile float distance[NUM_SWEEP_STEPS] = { 0 };
         void setStep( uint8_t step );
         void startSweep();
+        void stopSweep();
     
     private:
-        uint8_t trigPin;
-        uint8_t echoPin;
-        uint8_t servoPin;
-        ServoManager *servoManager;
-        float mach;
-        uint8_t sweeping;
-        uint8_t sweepStep;
+        const uint8_t trigPin;
+        const uint8_t echoPin;
+        const uint8_t servoPin;
+        const uint8_t driverType;
+        const MotorShield *motorShield;
+        const ServoManager *servoManager;
+        const float mach;
         static void trigger( void *object );
         static void echoReceived( void *object , uint8_t edgeType );
         volatile uint32_t echoStart;
+        uint8_t sweepID;
+        uint8_t sweeping;
+        uint8_t sweepStep;
     
 };
 
