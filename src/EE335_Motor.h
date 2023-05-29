@@ -12,9 +12,10 @@
 #warning "EE335_Motor is only tested for ATmega328P and ATmega2560"
 #endif
 
-#define TYPE_CUSTOM_MOTOR_SHIELD 0
-#define TYPE_ADAFRUIT_DC_MOTOR 1
-#define TYPE_H_BRIDGE 3
+#define DRIVER_UNDETERMINED 0
+#define DRIVER_CUSTOM_MOTOR_SHIELD 1
+#define DRIVER_ADAFRUIT_DC_MOTOR 2
+#define DRIVER_H_BRIDGE 3
 
 #define MOTOR_KP 1
 #define MOTOR_KI 5
@@ -22,10 +23,12 @@
 #define MOTOR_PID_SAMPLE_PERIOD 50
 
 class Motor {
+    friend class MotorPair;
+    
     public:
-        Motor( MotorShield *motorShield , uint8_t motorNumber );
-        Motor( Adafruit_DCMotor *adafruitDCMotor );
-        Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 );
+        Motor( MotorShield *motorShield , uint8_t motorNumber , Encoder *encoder=nullptr );
+        Motor( Adafruit_DCMotor *adafruitDCMotor , Encoder *encoder=nullptr );
+        Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 , Encoder *encoder=nullptr );
         void begin();
         void setDirection( uint8_t direction );
         void requestDirection( uint8_t direction );
@@ -47,12 +50,40 @@ class Motor {
         uint8_t pwmPin;
         uint8_t dirPin1;
         uint8_t dirPin2;
+        Encoder *encoder;
         uint8_t currentDirection;
         uint8_t directionToSet;
         bool updateDirectionFlag;
         uint16_t currentPWM;
         uint16_t pwmToSet;
         bool updatePWMFlag;
+        PID *pid;
+        bool cruiseEnabled;
+        uint8_t cruiseID;
+    
+};
+
+class MotorPair {
+    
+    public:
+        MotorPair( Motor *m1 , Motor *m2 , Encoder *encoder );
+        void begin();
+        void setDirection( uint8_t direction );
+        void requestDirection( uint8_t direction );
+        void setPWM( uint16_t val );
+        void requestPWM( uint16_t val );
+        void setPercent( float percent );
+        void requestPercent( float percent );
+        void update();
+        void attachEncoder( Encoder *encoder );
+        void enableCruise();
+        void setCruise( float speed );
+        void stopCruise();
+    
+    private:
+        Motor *m1;
+        Motor *m2;
+        uint8_t driverType;
         Encoder *encoder;
         PID *pid;
         bool cruiseEnabled;
