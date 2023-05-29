@@ -4,27 +4,27 @@ Motor::Motor( MotorShield *motorShield , uint8_t motorNumber ):
     driverType( TYPE_CUSTOM_MOTOR_SHIELD ) ,
     motorShield( motorShield ) ,
     motorNumber( motorNumber ) ,
-    pid( new PID(MOTOR_KP , MOTOR_KI , MOTOR_KD , MOTOR_PID_SAMPLE_PERIOD*0.001) ) ,
-    cruiseEnabled( false ) ,
     currentDirection( RELEASE ) ,
     directionToSet( 0 ) ,
     updateDirectionFlag( false ) ,
     currentPWM( 0 ) ,
     pwmToSet( 0 ) ,
-    updatePWMFlag( false )
+    updatePWMFlag( false ) ,
+    pid( new PID(MOTOR_KP , MOTOR_KI , MOTOR_KD , MOTOR_PID_SAMPLE_PERIOD*0.001) ) ,
+    cruiseEnabled( false )
 {}
 
 Motor::Motor( Adafruit_DCMotor *adafruitDCMotor ):
     driverType( TYPE_ADAFRUIT_DC_MOTOR ) ,
     adafruitDCMotor( adafruitDCMotor ) ,
-    pid( new PID(MOTOR_KP , MOTOR_KI , MOTOR_KD , MOTOR_PID_SAMPLE_PERIOD*0.001) ) ,
-    cruiseEnabled( false ) ,
     currentDirection( RELEASE ) ,
     directionToSet( 0 ) ,
     updateDirectionFlag( false ) ,
     currentPWM( 0 ) ,
     pwmToSet( 0 ) ,
-    updatePWMFlag( false )
+    updatePWMFlag( false ) ,
+    pid( new PID(MOTOR_KP , MOTOR_KI , MOTOR_KD , MOTOR_PID_SAMPLE_PERIOD*0.001) ) ,
+    cruiseEnabled( false )
 {}
 
 Motor::Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 ):
@@ -32,14 +32,14 @@ Motor::Motor( uint8_t pwmPin , uint8_t dirPin1 , uint8_t dirPin2 ):
     pwmPin( pwmPin ) ,
     dirPin1( dirPin1 ) ,
     dirPin2( dirPin2 ) ,
-    pid( new PID(MOTOR_KP , MOTOR_KI , MOTOR_KD , MOTOR_PID_SAMPLE_PERIOD*0.001) ) ,
-    cruiseEnabled( false ) ,
     currentDirection( RELEASE ) ,
     directionToSet( 0 ) ,
     updateDirectionFlag( false ) ,
     currentPWM( 0 ) ,
     pwmToSet( 0 ) ,
-    updatePWMFlag( false )
+    updatePWMFlag( false ) ,
+    pid( new PID(MOTOR_KP , MOTOR_KI , MOTOR_KD , MOTOR_PID_SAMPLE_PERIOD*0.001) ) ,
+    cruiseEnabled( false )
 {}
 
 void Motor::begin() {
