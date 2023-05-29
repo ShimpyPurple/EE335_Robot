@@ -9,7 +9,7 @@
 Gripper::Gripper( uint8_t pin , MotorShield *motorShield ):
     pin( pin ) ,
     driverType( DRIVER_CUSTOM_MOTOR_SHIELD ) ,
-    servoManager( servoManager )
+    motorShield( motorShield )
 {}
 
 Gripper::Gripper( uint8_t pin , ServoManager *servoManager ):
