@@ -174,7 +174,48 @@ void Bluetooth::sendState() {
     uint32_t ms = millis();
     if ( ms - lastSendTime < sendCooldown ) return;
     
+    uint8_t numBytesToSend = 1;
+    uint8_t buffer[5] = { 0,0,0,0,0 };
     
+    if ( speedometerState.speed != prevSpeedometerState.speed ) {
+        prevSpeedometerState.speed = speedometerState.speed;
+        buffer[numBytesToSend] = speedometerState.speed;
+        buffer[0] |= 0x01;
+        numBytesToSend += 1;
+    }
     
+    if ( speedometerState.cruiseSpeed != prevSpeedometerState.cruiseSpeed ) {
+        prevSpeedometerState.cruiseSpeed = speedometerState.cruiseSpeed;
+        buffer[numBytesToSend] = speedometerState.cruiseSpeed;
+        buffer[0] |= 0x02;
+        numBytesToSend += 1;
+    }
     
+    if ( speedometerState.cruiseControl ) buffer[0] |= 0x04;
+    if ( speedometerState.lineFollowing ) buffer[0] |= 0x08;
+    
+    if (
+        ( sonarState.heading != prevSonarState.heading ) ||
+        ( sonarState.range   != prevSonarState.range )
+    ) {
+        prevSonarState.heading = sonarState.heading;
+        prevSonarState.range   = sonarState.range;
+        buffer[numBytesToSend]   = prevSonarState.heading;
+        buffer[numBytesToSend+1] = prevSonarState.range;
+        buffer[0] |= 0x10;
+        numBytesToSend += 2;
+    }
+    
+    if (
+        ( speedometerState.cruiseControl != prevSpeedometerState.cruiseControl ) ||
+        ( speedometerState.lineFollowing != prevSpeedometerState.lineFollowing ) ||
+        ( numBytesToSend > 1 )
+    ) {
+        prevSpeedometerState.cruiseControl = speedometerState.cruiseControl;
+        prevSpeedometerState.lineFollowing = speedometerState.lineFollowing;
+        
+        btSerial->write( buffer , numBytesToSend );
+        
+        lastSendTime = ms;
+    }
 }
