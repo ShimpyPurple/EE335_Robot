@@ -2,7 +2,6 @@
 #define EE335_Encoder_h
 
 #include "Arduino.h"
-#include "Constants/Constants.h"
 #include "CustomTimers.h"
 #include "CustomInterrupts.h"
 
