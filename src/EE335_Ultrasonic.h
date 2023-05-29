@@ -32,13 +32,13 @@ class Ultrasonic {
         void stopSweep();
     
     private:
-        const uint8_t trigPin;
-        const uint8_t echoPin;
-        const uint8_t servoPin;
-        const uint8_t driverType;
-        const MotorShield *motorShield;
-        const ServoManager *servoManager;
-        const float mach;
+        uint8_t trigPin;
+        uint8_t echoPin;
+        uint8_t servoPin;
+        uint8_t driverType;
+        MotorShield *motorShield;
+        ServoManager *servoManager;
+        float mach;
         static void trigger( void *object );
         static void echoReceived( void *object , uint8_t edgeType );
         volatile uint32_t echoStart;

@@ -40,13 +40,13 @@ class Motor {
         void stopCruise();
         
     private:
-        const uint8_t driverType;
-        const MotorShield *motorShield;
-        const uint8_t motorNumber;
-        const Adafruit_DCMotor *adafruitDCMotor;
-        const uint8_t pwmPin;
-        const uint8_t dirPin1;
-        const uint8_t dirPin2;
+        uint8_t driverType;
+        MotorShield *motorShield;
+        uint8_t motorNumber;
+        Adafruit_DCMotor *adafruitDCMotor;
+        uint8_t pwmPin;
+        uint8_t dirPin1;
+        uint8_t dirPin2;
         uint8_t currentDirection;
         uint8_t directionToSet;
         bool updateDirectionFlag;

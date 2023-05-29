@@ -2,7 +2,7 @@
 
 uint16_t triggerCount = 0;
 
-Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , MotorShield *motorShield , float mach=343 ):
+Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , MotorShield *motorShield , float mach ):
     trigPin( trigPin ) ,
     echoPin( echoPin ) ,
     servoPin( servoPin ) ,
@@ -12,7 +12,7 @@ Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , M
     sweeping( NOT_SWEEPING )
 {}
 
-Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , ServoManager *servoManager , float mach=343 ):
+Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , ServoManager *servoManager , float mach ):
     trigPin( trigPin ) ,
     echoPin( echoPin ) ,
     servoPin( servoPin ) ,
@@ -32,7 +32,7 @@ void Ultrasonic::begin() {
     attachInterruptCustom( echoPin , CHANGE , echoReceived , this );
 }
 
-static void Ultrasonic::trigger( void *object ) {
+void Ultrasonic::trigger( void *object ) {
     Ultrasonic *ultrasonic = ( Ultrasonic* )( object );
     
     digitalWrite( ultrasonic->trigPin , HIGH );
@@ -72,7 +72,7 @@ void Ultrasonic::stopSweep() {
     }
 }
 
-static void Ultrasonic::echoReceived( void *object , uint8_t edgeType ) {
+void Ultrasonic::echoReceived( void *object , uint8_t edgeType ) {
     Ultrasonic *ultrasonic = ( Ultrasonic* )( object );
     uint32_t us = micros();
     

@@ -25,7 +25,7 @@ float Encoder::getSpeed() {
     return distancePerHole * 1e6 / period;
 }
 
-static void Encoder::onRisingEdge( void *object ) {
+void Encoder::onRisingEdge( void *object ) {
     Encoder *encoder = ( Encoder* )( object );
     uint32_t us = micros();
     encoder->distance += encoder->distancePerHole;
