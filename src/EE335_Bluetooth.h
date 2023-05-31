@@ -16,9 +16,10 @@
 
 class Bluetooth {
     public:
-        Bluetooth( uint8_t serialPort , void (**onRx)(Bluetooth*)=nullptr , uint16_t sendCooldown=10 );
+        Bluetooth( uint8_t serialPort , uint16_t sendCooldown=100 );
         void begin();
-        bool getInstruction();
+        void getInstruction();
+        bool isInstructionReceived();
         bool instructionReceived;
         struct {
             uint8_t rightJoystickRadius = 0;
@@ -48,24 +49,24 @@ class Bluetooth {
             void setSpeed( float speed , float minSpeed , float maxSpeed ) {
                 if ( speed < minSpeed ) speed = minSpeed;
                 if ( speed > maxSpeed ) speed = maxSpeed;
-                this->speed = ( speed - minSpeed ) / ( maxSpeed - minSpeed );
+                this->speed = ( speed - minSpeed ) / ( maxSpeed - minSpeed ) * 0xFF;
             }
             void setCruiseSpeed( float cruiseSpeed , float minSpeed , float maxSpeed ) {
                 if ( cruiseSpeed < minSpeed ) cruiseSpeed = minSpeed;
                 if ( cruiseSpeed > maxSpeed ) cruiseSpeed = maxSpeed;
-                this->cruiseSpeed = ( cruiseSpeed - minSpeed ) / ( maxSpeed - minSpeed );
+                this->cruiseSpeed = ( cruiseSpeed - minSpeed ) / ( maxSpeed - minSpeed ) * 0xFF;
             }
         } speedometerState;
         struct {
-            uint8_t heading;
-            uint8_t range;
+            uint8_t heading = 0;
+            uint8_t range = 0xFF;
             void setRange( float range , float minRange , float maxRange ) {
                 if ( range < minRange ) range = minRange;
                 if ( range > maxRange ) range = maxRange;
-                this->range = ( range - minRange ) / ( maxRange - minRange );
+                this->range = ( range - minRange ) / ( maxRange - minRange ) * 0xFF;
             }
         } sonarState;
-        void sendState();
+        void sendState( void (*updateState)() );
     
     private:
         HardwareSerial *btSerial;
@@ -78,8 +79,8 @@ class Bluetooth {
             bool lineFollowing = false;
         } prevSpeedometerState;
         struct {
-            uint8_t heading;
-            uint8_t range;
+            uint8_t heading = 0;
+            uint8_t range = 0xFF;
         } prevSonarState;
         uint32_t lastSendTime;
     

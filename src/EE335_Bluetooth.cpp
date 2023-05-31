@@ -30,7 +30,7 @@
 
 void idle() __attribute__( (weak) );
 
-Bluetooth::Bluetooth( uint8_t serialPort , void (**onRx)(Bluetooth*) , uint16_t sendCooldown ):
+Bluetooth::Bluetooth( uint8_t serialPort , uint16_t sendCooldown ):
     instructionReceived( false ) ,
     sendCooldown( sendCooldown ) ,
     lastSendTime( 0 )
@@ -44,23 +44,14 @@ Bluetooth::Bluetooth( uint8_t serialPort , void (**onRx)(Bluetooth*) , uint16_t 
 #endif
         default: btSerial = &Serial;  break;
     }
-    
-    if ( onRx != nullptr ) {
-        *onRx = []( Bluetooth *object ) {
-            Bluetooth *bluetooth = ( Bluetooth* )( object );
-            if ( bluetooth->getInstruction() ) {
-                bluetooth->instructionReceived = true;
-            }
-        };
-    }
 }
 
 void Bluetooth::begin() {
     btSerial->begin( 9600 );
 }
 
-bool Bluetooth::getInstruction() {
-    if ( !btSerial->available() ) return false;
+void Bluetooth::getInstruction() {
+    waitForSerial();
     
     uint8_t header = btSerial->read();
     
@@ -161,7 +152,15 @@ bool Bluetooth::getInstruction() {
         controllerState.start  = ( inByte & (1<<START)  );
     }
     
-    return true;
+    instructionReceived = true;
+}
+
+bool Bluetooth::isInstructionReceived() {
+    if ( instructionReceived ) {
+        instructionReceived = false;
+        return true;
+    }
+    return false;
 }
 
 void Bluetooth::waitForSerial() {
@@ -170,9 +169,14 @@ void Bluetooth::waitForSerial() {
     }
 }
 
-void Bluetooth::sendState() {
+void Bluetooth::sendState( void (*updateState)() ) {
     uint32_t ms = millis();
     if ( ms - lastSendTime < sendCooldown ) return;
+    
+    uint8_t oldSREG = SREG;
+    cli();
+    updateState();
+    SREG = oldSREG;
     
     uint8_t numBytesToSend = 1;
     uint8_t buffer[5] = { 0,0,0,0,0 };
@@ -206,6 +210,7 @@ void Bluetooth::sendState() {
         numBytesToSend += 2;
     }
     
+    
     if (
         ( speedometerState.cruiseControl != prevSpeedometerState.cruiseControl ) ||
         ( speedometerState.lineFollowing != prevSpeedometerState.lineFollowing ) ||
@@ -215,6 +220,11 @@ void Bluetooth::sendState() {
         prevSpeedometerState.lineFollowing = speedometerState.lineFollowing;
         
         btSerial->write( buffer , numBytesToSend );
+        
+        // Serial.print( "BT: " );
+        // Serial.print( buffer[1] );
+        // Serial.print( ' ' );
+        // Serial.println( buffer[2] );
         
         lastSendTime = ms;
     }
