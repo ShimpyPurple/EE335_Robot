@@ -10,7 +10,7 @@ void Lineread::begin(){
     attachInterruptCustom( pin , CHANGE , lineread_ISR , this );
 }
 
-static void Lineread::lineread_ISR( void *object ){
+void Lineread::lineread_ISR( void *object ){
     Lineread *lineread = ( Lineread* )( object );
     
     if( millis() - lineread->previnst <= 100 ){

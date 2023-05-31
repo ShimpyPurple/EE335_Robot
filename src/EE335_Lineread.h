@@ -3,7 +3,6 @@
 
 #include "Arduino.h"
 #include "CustomInterrupts.h"
-#include "Constants/Constants.h"
 
 #if !defined( __AVR_ATmega328P__ ) && !defined( __AVR_ATmega2560__ )
 #warning "EE335_Lineread is only tested for ATmega328P and ATmega2560"
