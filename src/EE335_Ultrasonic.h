@@ -17,7 +17,8 @@ class Ultrasonic {
         Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , MotorShield *motorShield , float mach=343 );
         Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , ServoManager *servoManager , float mach=343 );
         void begin();
-        volatile float distance[NUM_SWEEP_STEPS] = { 0 };
+        volatile uint8_t heading;
+        volatile float range;
         void setStep( uint8_t step );
         void startSweep();
         void stopSweep();
@@ -35,7 +36,7 @@ class Ultrasonic {
         volatile uint32_t echoStart;
         uint8_t sweepID;
         uint8_t sweeping;
-        uint8_t sweepStep;
+        volatile uint8_t sweepStep;
     
 };
 
