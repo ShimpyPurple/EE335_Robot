@@ -10,13 +10,12 @@
 
 class Lineread {
     public:
-        Lineread( uint8_t pin );
+        Lineread( uint8_t pin , void (*onLineEdge)(uint8_t) );
         void begin();
     
     private:
         uint8_t pin;
-        unsigned long previnst;
-        static void lineread_ISR( void *object );
+        void ( *onLineEdge )( uint8_t );
         
 };
 
