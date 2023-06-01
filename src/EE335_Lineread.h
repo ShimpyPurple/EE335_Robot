@@ -8,14 +8,21 @@
 #warning "EE335_Lineread is only tested for ATmega328P and ATmega2560"
 #endif
 
+#define LINEREAD_RIGHT 0
+#define LINEREAD_LEFT  1
+
 class Lineread {
     public:
-        Lineread( uint8_t pin , void (*onLineEdge)(uint8_t) );
+        Lineread( uint8_t rightPin , uint8_t leftPin , void (*onLineEdge)(uint8_t , uint8_t) );
         void begin();
+        void startFollowing();
+        void stopFollowing();
     
     private:
-        uint8_t pin;
-        void ( *onLineEdge )( uint8_t );
+        uint8_t rightPin;
+        uint8_t leftPin;
+        void ( *onLineEdge )( uint8_t , uint8_t );
+        bool following;
         
 };
 
