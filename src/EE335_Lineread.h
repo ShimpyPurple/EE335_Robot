@@ -17,6 +17,7 @@ class Lineread {
         void begin();
         void startFollowing();
         void stopFollowing();
+        bool isFollowing();
     
     private:
         uint8_t rightPin;

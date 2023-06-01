@@ -39,3 +39,4 @@ void Lineread::begin(){
 
 void Lineread::startFollowing() { following = true; }
 void Lineread::stopFollowing() { following = false; }
+bool Lineread::isFollowing() { return following; }
