@@ -14,13 +14,29 @@
 
 #define ALL_HEADINGS 0xFF
 
+class ControllerButton {
+    friend class Bluetooth;
+    
+    public:
+        ControllerButton();
+        bool getState();
+        bool isPressed();
+        bool isReleased();
+    
+    private:
+        void setState( bool newState );
+        bool state;
+        bool prev;
+    
+};
+
 class Bluetooth {
     public:
         Bluetooth( uint8_t serialPort , uint8_t statePin , uint16_t sendCooldown=100 );
         void begin();
-        void getInstruction();
-        bool isInstructionReceived();
-        bool instructionReceived;
+        bool connected;
+        bool getInstruction();
+        // Move these structs into external classes
         struct {
             uint8_t rightJoystickRadius = 0;
             uint8_t leftJoystickRadius  = 0;
@@ -28,18 +44,19 @@ class Bluetooth {
             float leftJoystickAngle  = 0;
             uint8_t rightTrigger = 0;
             uint8_t leftTrigger  = 0;
-            bool dPadUp    = false;
-            bool dPadDown  = false;
-            bool dPadRight = false;
-            bool dPadLeft  = false;
-            bool buttonA = false;
-            bool buttonB = false;
-            bool buttonX = false;
-            bool buttonY = false;
-            bool rightBumper = false;
-            bool leftBumper  = false;
-            bool select = false;
-            bool start  = false;
+            // Able to group these into 2 uint8's. Do that sometime
+            ControllerButton dPadUp;
+            ControllerButton dPadDown;
+            ControllerButton dPadRight;
+            ControllerButton dPadLeft;
+            ControllerButton buttonA;
+            ControllerButton buttonB;
+            ControllerButton buttonX;
+            ControllerButton buttonY;
+            ControllerButton rightBumper;
+            ControllerButton leftBumper;
+            ControllerButton select;
+            ControllerButton start;
         } controllerState;
         struct {
             uint8_t speed = 0;
@@ -71,9 +88,9 @@ class Bluetooth {
     private:
         HardwareSerial *btSerial;
         uint8_t statePin;
-        bool connected;
         uint16_t sendCooldown;
         void waitForSerial();
+        // These ones too
         struct {
             uint8_t speed = 0;
             uint8_t cruiseSpeed = 0;

@@ -28,12 +28,37 @@
 #define SELECT 6
 #define START  7
 
+// ----------------------------------- //
+//            Idle Function            //
+// ----------------------------------- //
+
 void idle() __attribute__( (weak) );
 
+// -------------------------------------- //
+//            ControllerButton            //
+// -------------------------------------- //
+
+ControllerButton::ControllerButton():
+    state( false ) ,
+    prev( false )
+{}
+
+void ControllerButton::setState( bool newState ) {
+    prev = state;
+    state = newState;
+}
+
+bool ControllerButton::getState() { return state; }
+bool ControllerButton::isPressed()  { return  state && !prev; }
+bool ControllerButton::isReleased() { return !state &&  prev; }
+
+// ------------------------------- //
+//            Bluetooth            //
+// ------------------------------- //
+
 Bluetooth::Bluetooth( uint8_t serialPort , uint8_t statePin , uint16_t sendCooldown ):
-    instructionReceived( false ) ,
-    statePin( statePin ) ,
     connected( false ) ,
+    statePin( statePin ) ,
     sendCooldown( sendCooldown ) ,
     lastSendTime( 0 )
 {
@@ -53,7 +78,7 @@ void Bluetooth::begin() {
     pinMode( statePin , INPUT );
 }
 
-void Bluetooth::getInstruction() {
+bool Bluetooth::getInstruction() {
     bool currentState = digitalRead( statePin );
     if( !currentState ) {
         if ( connected != currentState ) {
@@ -65,26 +90,27 @@ void Bluetooth::getInstruction() {
             controllerState.leftJoystickAngle  = 0;
             controllerState.rightTrigger = 0;
             controllerState.leftTrigger  = 0;
-            controllerState.dPadUp    = false;
-            controllerState.dPadDown  = false;
-            controllerState.dPadRight = false;
-            controllerState.dPadLeft  = false;
-            controllerState.buttonA = false;
-            controllerState.buttonB = false;
-            controllerState.buttonX = false;
-            controllerState.buttonY = false;
-            controllerState.rightBumper = false;
-            controllerState.leftBumper  = false;
-            controllerState.select = false;
-            controllerState.start  = false;
+            controllerState.dPadUp.setState(    false );
+            controllerState.dPadDown.setState(  false );
+            controllerState.dPadRight.setState( false );
+            controllerState.dPadLeft.setState(  false );
+            controllerState.buttonA.setState( false );
+            controllerState.buttonB.setState( false );
+            controllerState.buttonX.setState( false );
+            controllerState.buttonY.setState( false );
+            controllerState.rightBumper.setState( false );
+            controllerState.leftBumper.setState(  false );
+            controllerState.select.setState( false );
+            controllerState.start.setState(  false );
             
-            instructionReceived = true;
+            return true;
         }
-        return;
+        return false;
     }
     connected = true;
     
-    waitForSerial();
+    if ( !btSerial->available() ) return false;
+    
     uint8_t header = btSerial->read();
     
     if ( header & (1<<R_JOYSTICK) ) {
@@ -165,34 +191,26 @@ void Bluetooth::getInstruction() {
     if ( header & (1<<DPAD) ) {
         waitForSerial();
         uint8_t inByte = btSerial->read();
-        controllerState.dPadUp    = ( inByte & (1<<DPAD_UP)    );
-        controllerState.dPadDown  = ( inByte & (1<<DPAD_DOWN)  );
-        controllerState.dPadRight = ( inByte & (1<<DPAD_RIGHT) );
-        controllerState.dPadLeft  = ( inByte & (1<<DPAD_LEFT)  );
+        controllerState.dPadUp.setState(    inByte & (1<<DPAD_UP)    );
+        controllerState.dPadDown.setState(  inByte & (1<<DPAD_DOWN)  );
+        controllerState.dPadRight.setState( inByte & (1<<DPAD_RIGHT) );
+        controllerState.dPadLeft.setState(  inByte & (1<<DPAD_LEFT)  );
     }
     
     if ( header & (1<<BUTTONS) ) {
         waitForSerial();
         uint8_t inByte = btSerial->read();
-        controllerState.buttonA = ( inByte & (1<<BUTTON_A) );
-        controllerState.buttonB = ( inByte & (1<<BUTTON_B) );
-        controllerState.buttonX = ( inByte & (1<<BUTTON_X) );
-        controllerState.buttonY = ( inByte & (1<<BUTTON_Y) );
-        controllerState.rightBumper = ( inByte & (1<<R_BUMPER) );
-        controllerState.leftBumper  = ( inByte & (1<<L_BUMPER) );
-        controllerState.select = ( inByte & (1<<SELECT) );
-        controllerState.start  = ( inByte & (1<<START)  );
+        controllerState.buttonA.setState( inByte & (1<<BUTTON_A) );
+        controllerState.buttonB.setState( inByte & (1<<BUTTON_B) );
+        controllerState.buttonX.setState( inByte & (1<<BUTTON_X) );
+        controllerState.buttonY.setState( inByte & (1<<BUTTON_Y) );
+        controllerState.rightBumper.setState( inByte & (1<<R_BUMPER) );
+        controllerState.leftBumper.setState(  inByte & (1<<L_BUMPER) );
+        controllerState.select.setState( inByte & (1<<SELECT) );
+        controllerState.start.setState(  inByte & (1<<START)  );
     }
     
-    instructionReceived = true;
-}
-
-bool Bluetooth::isInstructionReceived() {
-    if ( instructionReceived ) {
-        instructionReceived = false;
-        return true;
-    }
-    return false;
+    return true;
 }
 
 void Bluetooth::waitForSerial() {
@@ -254,11 +272,6 @@ void Bluetooth::sendState( void (*updateState)() ) {
         prevSpeedometerState.lineFollowing = speedometerState.lineFollowing;
         
         btSerial->write( buffer , numBytesToSend );
-        
-        // Serial.print( "BT: " );
-        // Serial.print( buffer[1] );
-        // Serial.print( ' ' );
-        // Serial.println( buffer[2] );
         
         lastSendTime = ms;
     }
