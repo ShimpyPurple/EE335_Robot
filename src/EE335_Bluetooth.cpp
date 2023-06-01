@@ -30,8 +30,10 @@
 
 void idle() __attribute__( (weak) );
 
-Bluetooth::Bluetooth( uint8_t serialPort , uint16_t sendCooldown ):
+Bluetooth::Bluetooth( uint8_t serialPort , uint8_t statePin , uint16_t sendCooldown ):
     instructionReceived( false ) ,
+    statePin( statePin ) ,
+    connected( false ) ,
     sendCooldown( sendCooldown ) ,
     lastSendTime( 0 )
 {
@@ -48,11 +50,41 @@ Bluetooth::Bluetooth( uint8_t serialPort , uint16_t sendCooldown ):
 
 void Bluetooth::begin() {
     btSerial->begin( 9600 );
+    pinMode( statePin , INPUT );
 }
 
 void Bluetooth::getInstruction() {
-    waitForSerial();
+    bool currentState = digitalRead( statePin );
+    if( !currentState ) {
+        if ( connected != currentState ) {
+            connected = false;
+            
+            controllerState.rightJoystickRadius = 0;
+            controllerState.leftJoystickRadius  = 0;
+            controllerState.rightJoystickAngle = 0;
+            controllerState.leftJoystickAngle  = 0;
+            controllerState.rightTrigger = 0;
+            controllerState.leftTrigger  = 0;
+            controllerState.dPadUp    = false;
+            controllerState.dPadDown  = false;
+            controllerState.dPadRight = false;
+            controllerState.dPadLeft  = false;
+            controllerState.buttonA = false;
+            controllerState.buttonB = false;
+            controllerState.buttonX = false;
+            controllerState.buttonY = false;
+            controllerState.rightBumper = false;
+            controllerState.leftBumper  = false;
+            controllerState.select = false;
+            controllerState.start  = false;
+            
+            instructionReceived = true;
+        }
+        return;
+    }
+    connected = true;
     
+    waitForSerial();
     uint8_t header = btSerial->read();
     
     if ( header & (1<<R_JOYSTICK) ) {
@@ -172,6 +204,8 @@ void Bluetooth::waitForSerial() {
 void Bluetooth::sendState( void (*updateState)() ) {
     uint32_t ms = millis();
     if ( ms - lastSendTime < sendCooldown ) return;
+    
+    if ( !digitalRead(statePin) ) return;
     
     uint8_t oldSREG = SREG;
     cli();

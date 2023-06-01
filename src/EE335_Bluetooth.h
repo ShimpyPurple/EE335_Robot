@@ -16,7 +16,7 @@
 
 class Bluetooth {
     public:
-        Bluetooth( uint8_t serialPort , uint16_t sendCooldown=100 );
+        Bluetooth( uint8_t serialPort , uint8_t statePin , uint16_t sendCooldown=100 );
         void begin();
         void getInstruction();
         bool isInstructionReceived();
@@ -70,6 +70,8 @@ class Bluetooth {
     
     private:
         HardwareSerial *btSerial;
+        uint8_t statePin;
+        bool connected;
         uint16_t sendCooldown;
         void waitForSerial();
         struct {
