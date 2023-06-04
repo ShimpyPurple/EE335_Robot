@@ -1,8 +1,9 @@
 #include "EE335_Ultrasonic.h"
 
 #define NOT_SWEEPING 0
-#define SWEEPING_DOWN 1
-#define SWEEPING_UP 2
+#define SWEEPING_STEADY 1
+#define SWEEPING_DOWN 2
+#define SWEEPING_UP 3
 
 #define DRIVER_CUSTOM_MOTOR_SHIELD 0
 #define DRIVER_CUSTOM_SERVO_MANAGER 1
@@ -14,6 +15,7 @@ Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , M
     driverType( DRIVER_CUSTOM_MOTOR_SHIELD ) ,
     motorShield( motorShield ) ,
     mach( mach ) ,
+    clearSonarFlag( false ) ,
     sweeping( NOT_SWEEPING )
 {}
 
@@ -24,6 +26,7 @@ Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , S
     driverType( DRIVER_CUSTOM_SERVO_MANAGER ) ,
     servoManager( servoManager ) ,
     mach( mach ) ,
+    clearSonarFlag( false ) ,
     sweeping( NOT_SWEEPING )
 {}
 
@@ -51,11 +54,31 @@ void Ultrasonic::setStep( uint8_t step ) {
 }
 
 void Ultrasonic::startSweep() {
-    if( sweeping == NOT_SWEEPING ) {
-        sweeping = SWEEPING_UP;
-        setStep( 0 );
-        sweepID = runAfter( 1000 , trigger , this , 250 );
+    if ( sweeping != NOT_SWEEPING ) {
+        stopSweep();
     }
+    clearSonarFlag = true;
+    sweeping = SWEEPING_UP;
+    setStep( 0 );
+    sweepID = runAfter( 1000 , trigger , this , 250 );
+}
+
+void Ultrasonic::scanInDirection( uint8_t step ) {
+    if ( sweeping != NOT_SWEEPING ) {
+        stopSweep();
+    }
+    clearSonarFlag = true;
+    sweeping = SWEEPING_STEADY;
+    setStep( step );
+    sweepID = runAfter( 1000 , trigger , this , 250 );
+}
+
+bool Ultrasonic::clearSonar() {
+    if ( clearSonarFlag ) {
+        clearSonarFlag = false;
+        return true;
+    }
+    return false;
 }
 
 void Ultrasonic::stopSweep() {
@@ -72,31 +95,33 @@ void Ultrasonic::trigger( void *object ) {
     delayMicroseconds( 10 );
     digitalWrite( ultrasonic->trigPin , LOW );
     
-    runAfter(
-        160 ,
-        []( void *object ) {
-            Ultrasonic *ultrasonic = ( Ultrasonic* )( object );
-            switch ( ultrasonic->sweeping ) {
-                case SWEEPING_DOWN:
-                    if ( ultrasonic->sweepStep == 0 ) {
-                        ultrasonic->setStep( ultrasonic->sweepStep + 1 );
-                        ultrasonic->sweeping = SWEEPING_UP;
-                    } else {
-                        ultrasonic->setStep( ultrasonic->sweepStep - 1 );
-                    }
-                    break;
-                case SWEEPING_UP:
-                    if ( ultrasonic->sweepStep == NUM_SWEEP_STEPS-1 ) {
-                        ultrasonic->setStep( ultrasonic->sweepStep - 1 );
-                        ultrasonic->sweeping = SWEEPING_DOWN;
-                    } else {
-                        ultrasonic->setStep( ultrasonic->sweepStep + 1 );
-                    }
-                    break;
-            }
-        } ,
-        object
-    );
+    if ( (ultrasonic->sweeping == SWEEPING_DOWN) || (ultrasonic->sweeping == SWEEPING_UP) ) {
+        runAfter(
+            160 ,
+            []( void *object ) {
+                Ultrasonic *ultrasonic = ( Ultrasonic* )( object );
+                switch ( ultrasonic->sweeping ) {
+                    case SWEEPING_DOWN:
+                        if ( ultrasonic->sweepStep == 0 ) {
+                            ultrasonic->setStep( ultrasonic->sweepStep + 1 );
+                            ultrasonic->sweeping = SWEEPING_UP;
+                        } else {
+                            ultrasonic->setStep( ultrasonic->sweepStep - 1 );
+                        }
+                        break;
+                    case SWEEPING_UP:
+                        if ( ultrasonic->sweepStep == NUM_SWEEP_STEPS-1 ) {
+                            ultrasonic->setStep( ultrasonic->sweepStep - 1 );
+                            ultrasonic->sweeping = SWEEPING_DOWN;
+                        } else {
+                            ultrasonic->setStep( ultrasonic->sweepStep + 1 );
+                        }
+                        break;
+                }
+            } ,
+            object
+        );
+    }
     
 }
 

@@ -21,7 +21,9 @@ class Ultrasonic {
         volatile float range;
         void setStep( uint8_t step );
         void startSweep();
+        void scanInDirection( uint8_t step );
         void stopSweep();
+        bool clearSonar();
     
     private:
         uint8_t trigPin;
@@ -34,6 +36,7 @@ class Ultrasonic {
         static void trigger( void *object );
         static void echoReceived( void *object , uint8_t edgeType );
         volatile uint32_t echoStart;
+        bool clearSonarFlag;
         uint8_t sweepID;
         uint8_t sweeping;
         volatile uint8_t sweepStep;
