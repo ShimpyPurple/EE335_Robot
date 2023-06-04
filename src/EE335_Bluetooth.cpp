@@ -250,18 +250,19 @@ void Bluetooth::sendState( void (*updateState)() ) {
     if ( speedometerState.cruiseControl ) buffer[0] |= 0x04;
     if ( speedometerState.lineFollowing ) buffer[0] |= 0x08;
     
-    if (
-        ( sonarState.heading != prevSonarState.heading ) ||
-        ( sonarState.range   != prevSonarState.range )
-    ) {
+    if ( sonarState.heading != prevSonarState.heading ) {
         prevSonarState.heading = sonarState.heading;
-        prevSonarState.range   = sonarState.range;
         buffer[numBytesToSend]   = prevSonarState.heading;
-        buffer[numBytesToSend+1] = prevSonarState.range;
         buffer[0] |= 0x10;
-        numBytesToSend += 2;
+        numBytesToSend += 1;
     }
     
+    if ( sonarState.range != prevSonarState.range ) {
+        prevSonarState.range = sonarState.range;
+        buffer[numBytesToSend]   = prevSonarState.range;
+        buffer[0] |= 0x20;
+        numBytesToSend += 1;
+    }
     
     if (
         ( speedometerState.cruiseControl != prevSpeedometerState.cruiseControl ) ||
