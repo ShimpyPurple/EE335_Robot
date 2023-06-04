@@ -76,7 +76,7 @@ class Bluetooth {
         } speedometerState;
         struct {
             uint8_t heading = 0;
-            uint8_t range = 0xFF;
+            uint8_t range = 0;
             void setRange( float range , float minRange , float maxRange ) {
                 if ( range < minRange ) range = minRange;
                 if ( range > maxRange ) range = maxRange;
@@ -99,7 +99,7 @@ class Bluetooth {
         } prevSpeedometerState;
         struct {
             uint8_t heading = 0;
-            uint8_t range = 0xFF;
+            uint8_t range = 0;
         } prevSonarState;
         uint32_t lastSendTime;
     
