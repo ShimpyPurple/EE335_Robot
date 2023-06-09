@@ -2,6 +2,7 @@
 #define EE335_Gripper_h
 
 #include "Arduino.h"
+#include "CustomInterrupts.h"
 #include "CustomMotorShield.h"
 #include "CustomServos.h"
 
@@ -14,15 +15,22 @@ class Gripper {
         Gripper( uint8_t pin , MotorShield *motorShield );
         Gripper( uint8_t pin , ServoManager *servoManager );
         void begin();
+        void write( float percent );
         void open();
         void close();
-        void write( float percent );
+        void slowWrite( float percent );
+        void slowOpen();
+        void slowClose();
+        void stopSlowWrite();
     
     private:
         uint8_t pin;
         uint8_t driverType;
         MotorShield *motorShield;
         ServoManager *servoManager;
+        float position;
+        float targetPosition;
+        uint8_t slowWriteID;
     
 };
 

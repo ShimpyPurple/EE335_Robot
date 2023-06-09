@@ -20,6 +20,8 @@ class Ultrasonic {
         volatile uint8_t heading;
         volatile float range;
         void setStep( uint8_t step );
+        void runAtRange( float rangeMin , float rangeMax , void (*enterRange)() , void (*leaveRange)() );
+        void stopRunAtRange();
         void startSweep();
         void scanInDirection( uint8_t step );
         void stopSweep();
@@ -33,6 +35,11 @@ class Ultrasonic {
         MotorShield *motorShield;
         ServoManager *servoManager;
         float mach;
+        float atRangeMin;
+        float atRangeMax;
+        bool withinRange;
+        void ( *enterRangeFunc )();
+        void ( *leaveRangeFunc )();
         static void trigger( void *object );
         static void echoReceived( void *object , uint8_t edgeType );
         volatile uint32_t echoStart;

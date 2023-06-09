@@ -15,6 +15,11 @@ Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , M
     driverType( DRIVER_CUSTOM_MOTOR_SHIELD ) ,
     motorShield( motorShield ) ,
     mach( mach ) ,
+    atRangeMin( 0 ) ,
+    atRangeMax( 0 ) ,
+    withinRange( false ) ,
+    enterRangeFunc( nullptr ) ,
+    leaveRangeFunc( nullptr ) ,
     clearSonarFlag( false ) ,
     sweeping( NOT_SWEEPING )
 {}
@@ -26,6 +31,11 @@ Ultrasonic::Ultrasonic( uint8_t trigPin , uint8_t echoPin , uint8_t servoPin , S
     driverType( DRIVER_CUSTOM_SERVO_MANAGER ) ,
     servoManager( servoManager ) ,
     mach( mach ) ,
+    atRangeMin( 0 ) ,
+    atRangeMax( 0 ) ,
+    withinRange( false ) ,
+    enterRangeFunc( nullptr ) ,
+    leaveRangeFunc( nullptr ) ,
     clearSonarFlag( false ) ,
     sweeping( NOT_SWEEPING )
 {}
@@ -53,6 +63,18 @@ void Ultrasonic::setStep( uint8_t step ) {
     sweepStep = step;
 }
 
+void Ultrasonic::runAtRange( float rangeMin , float rangeMax , void (*enterRange)() , void (*leaveRange)() ) {
+    atRangeMin = rangeMin;
+    atRangeMax = rangeMax;
+    enterRangeFunc = enterRange;
+    leaveRangeFunc = leaveRange;
+}
+
+void Ultrasonic::stopRunAtRange() {
+    enterRangeFunc = nullptr;
+    leaveRangeFunc = nullptr;
+}
+
 void Ultrasonic::startSweep() {
     if ( sweeping != NOT_SWEEPING ) {
         stopSweep();
@@ -70,7 +92,17 @@ void Ultrasonic::scanInDirection( uint8_t step ) {
     clearSonarFlag = true;
     sweeping = SWEEPING_STEADY;
     setStep( step );
-    sweepID = runAfter( 1000 , trigger , this , 250 );
+    if ( driverType == DRIVER_CUSTOM_MOTOR_SHIELD ) {
+        runAfter(
+            500 ,
+            []( void *object ){
+                Ultrasonic *ultrasonic = ( Ultrasonic* )( object );
+                ultrasonic->motorShield->releaseServo( ultrasonic->servoPin );
+            } ,
+            this
+        );
+    }
+    sweepID = runAfter( 1000 , trigger , this , 50 );
 }
 
 bool Ultrasonic::clearSonar() {
@@ -85,6 +117,15 @@ void Ultrasonic::stopSweep() {
     if( sweeping != NOT_SWEEPING ) {
         sweeping = NOT_SWEEPING;
         runAfterCancel( sweepID );
+        switch ( driverType ) {
+            case DRIVER_CUSTOM_MOTOR_SHIELD:
+                motorShield->releaseServo( servoPin );
+                break;
+            case DRIVER_CUSTOM_SERVO_MANAGER:
+                servoManager->remove( servoPin );
+                break;
+            default: return;
+        }
     }
 }
 
@@ -136,6 +177,26 @@ void Ultrasonic::echoReceived( void *object , uint8_t edgeType ) {
         case FALLING:
             ultrasonic->heading = ultrasonic->sweepStep;
             ultrasonic->range = ( us - ultrasonic->echoStart ) * ultrasonic->mach / 2 / 1e6;
+            if (
+                ( ultrasonic->range >= ultrasonic->atRangeMin ) &&
+                ( ultrasonic->range <= ultrasonic->atRangeMax )
+            ) {
+                if (
+                    !ultrasonic->withinRange &&
+                    ( ultrasonic->enterRangeFunc != nullptr )
+                ) {
+                    ultrasonic->enterRangeFunc();
+                }
+                ultrasonic->withinRange = true;
+            } else {
+                if (
+                    ultrasonic->withinRange &&
+                    ( ultrasonic->leaveRangeFunc != nullptr )
+                ) {
+                    ultrasonic->leaveRangeFunc();
+                }
+                ultrasonic->withinRange = false;
+            }
             break;
     }
 }
